@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Alina Akhankova](https://up.htmlacademy.ru/ecmascript/16/user/567837).
-* Наставник: `Неизвестно`.
+* Наставник: [Артур Галимов](https://up.htmlacademy.ru/ecmascript/16/user/1237543).
 
 ---
 
