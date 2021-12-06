@@ -1,3 +1,5 @@
+import { createElement } from '../render';
+
 const createFilterItemTemplate = (filter) => {
   const { name, count } = filter;
   return (
@@ -7,16 +9,42 @@ const createFilterItemTemplate = (filter) => {
   );
 };
 
-
-export const createNavigationTemplate = (filterItems) => {
+const createMainNavigation = (filterItems) => {
   const filterItemsTemplate = filterItems
-    .map((filter) => createFilterItemTemplate(filter))
+    .map((filter, index) => createFilterItemTemplate(filter, index === 0))
     .join('');
+
   return (
-    `  <nav class="main-navigation">
-      <div class="main-navigation__items">
-      ${filterItemsTemplate}
-    </div>
+    `<nav class="main-navigation">
+    <div class="main-navigation__items">
+    ${filterItemsTemplate}
+      </div>
     <a href="#stats" class="main-navigation__additional">Stats</a>
-</nav>`);
+  </nav>`
+  );
 };
+
+export default class NavigationView {
+  #element = null;
+  #filters = null;
+
+  constructor(filters) {
+    this.#filters = filters;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createMainNavigation(this.#filters);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

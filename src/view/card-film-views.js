@@ -4,8 +4,9 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
+import {createElement} from '../render.js';
 
-export const createCardFilmTemplate = (card) => {
+const createCardFilmTemplate = (card) => {
   const {title, totalRating, genre, runtime, poster, descriptionCard, comments, releaseDate, isWatchlist, isWatched, isFavorites} = card;
   const filmRuntime = getTime(runtime);
   const washListClassName = isWatchlist
@@ -22,6 +23,7 @@ export const createCardFilmTemplate = (card) => {
 
   return (
     `<article class="film-card">
+    <a class="film-card__link">
     <h3 class="film-card__title">${title}</h3>
     <p class="film-card__rating">${totalRating}</p>
     <p class="film-card__info">
@@ -31,7 +33,8 @@ export const createCardFilmTemplate = (card) => {
     </p>
     <img src="${poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${descriptionCard}</p>
-    <a class="film-card__comments">${comments} comments</a>
+    <span class="film-card__comments">${comments} comments</span>
+    </a>
     <div class="film-card__controls">
       <button class="${washListClassName}" type="button">Add to watchlist</button>
       <button class="${watchingClassName}" type="button">Mark as watched</button>
@@ -40,3 +43,29 @@ export const createCardFilmTemplate = (card) => {
   </article>`
   );
 };
+
+export default class CardFilmView {
+  #element = null;
+  #card = null;
+
+  constructor(card) {
+    this.#card = card;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createCardFilmTemplate(this.#card);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
+
