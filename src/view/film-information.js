@@ -5,6 +5,7 @@ dayjs.extend(duration);
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import {getTime} from '../utils.js';
+import {createElement} from '../render.js';
 
 const creatCommentCountTemplate = (comments) => comments > 0 ? `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>` : ' ';
 const createFilmPopupCommentsTemplate = (commentLi) => {
@@ -32,7 +33,7 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
 };
 const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment));
 
-export const createFilmInformationTemplate = (film) => {
+const createFilmInformationTemplate = (film) => {
   const {title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentsText, newTextComment, smile, value, comments} = film;
   const filmRuntime = getTime(runtime);
   const washListClassName = isWatchlist
@@ -150,4 +151,29 @@ export const createFilmInformationTemplate = (film) => {
   </form>
 </section>`);
 };
+
+export default class FilmInfotmationView {
+  #element = null;
+  #film = null;
+
+  constructor(film) {
+    this.#film = film;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilmInformationTemplate(this.#film);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
 

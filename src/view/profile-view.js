@@ -1,3 +1,5 @@
+import { createElement } from '../render.js';
+
 const getRating = (wachedMovies) => {
   if(wachedMovies === 0){
     return '';
@@ -13,7 +15,7 @@ const getRating = (wachedMovies) => {
   }
 };
 
-export const createProfileTemplate = (films) => {
+const createProfileTemplate = (films) => {
   const filmCount = films.filter((card) => card.isWatchlist).length;
   return (
     `<section class="header__profile profile">
@@ -21,3 +23,28 @@ export const createProfileTemplate = (films) => {
     <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
   </section>`);
 };
+
+export default class ProfileView {
+  #element = null;
+  #films = null;
+
+  constructor(films) {
+    this.#films = films;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createProfileTemplate(this.#films);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
