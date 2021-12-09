@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
-import {createElement} from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const createCardFilmTemplate = (card) => {
   const {title, totalRating, genre, runtime, poster, descriptionCard, comments, releaseDate, isWatchlist, isWatched, isFavorites} = card;
@@ -44,28 +44,27 @@ const createCardFilmTemplate = (card) => {
   );
 };
 
-export default class CardFilmView {
-  #element = null;
+export default class CardFilmView extends AbstractView {
   #card = null;
 
   constructor(card) {
+    super();
     this.#card = card;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createCardFilmTemplate(this.#card);
   }
 
-  removeElement() {
-    this.#element = null;
+  setCardClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#cardClickHandler);
   }
+
+  #cardClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  }
+
 }
 

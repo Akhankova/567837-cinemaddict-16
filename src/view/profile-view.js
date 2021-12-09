@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const getRating = (wachedMovies) => {
   if(wachedMovies === 0){
@@ -24,27 +24,15 @@ const createProfileTemplate = (films) => {
   </section>`);
 };
 
-export default class ProfileView {
-  #element = null;
+export default class ProfileView extends AbstractView{
   #films = null;
 
   constructor(films) {
+    super();
     this.#films = films;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createProfileTemplate(this.#films);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
