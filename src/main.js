@@ -1,5 +1,5 @@
 import ProfileView from './view/profile-view.js';
-import { RenderPosition, render } from './render.js';
+import { RenderPosition, render, remove } from './render.js';
 import NavigationView from './view/navigation-view';
 import SortView from './view/sort-view';
 import BoardFilmsView from './view/board-films-views';
@@ -23,13 +23,13 @@ const siteMainElement = document.querySelector('.main');
 const footer = document.querySelector('.footer');
 const bodyElement = document.querySelector('body');
 
-let filmEditComponent;
 const renderFilmInfo = (cardListElement, card) => {
   const filmComponent = new CardFilmView(card);
+  const filmEditComponent = new FilmInfotmationView(card);
 
   const onReplaceFormCardInfoClick = () => {
     bodyElement.classList.remove('hide-overflow');
-    document.body.removeChild(filmEditComponent);
+    remove(filmEditComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -37,41 +37,43 @@ const renderFilmInfo = (cardListElement, card) => {
       evt.preventDefault();
       bodyElement.classList.remove('hide-overflow');
       onReplaceFormCardInfoClick();
-      document.removeEventListener('keydown', this._onEscKeyDown);
+      document.removeEventListener('keydown', onEscKeyDown);
     }
   };
 
   const onGetFormCardInfoClick = () => {
-    if (document.body.querySelector('.film-details')) {
-      document.body.querySelector('.film-details').remove();
+    if (bodyElement.querySelector('.film-details')) {
+      bodyElement.querySelector('.film-details').remove();
     }
-    filmEditComponent = new FilmInfotmationView(card).element;
     bodyElement.classList.add('hide-overflow');
-    document.body.appendChild(filmEditComponent, RenderPosition.BEFOREEND);
-    filmEditComponent.querySelector('.film-details__close-btn').addEventListener('click', onReplaceFormCardInfoClick);
+    bodyElement.appendChild(filmEditComponent.element, RenderPosition.BEFOREEND);
+    filmEditComponent.setEditClickHandler(() => {
+      onReplaceFormCardInfoClick();
+    });
     document.addEventListener('keydown', onEscKeyDown);
   };
 
-  const filmLink = filmComponent.element.querySelector('.film-card__link');
-  filmLink.addEventListener('click', onGetFormCardInfoClick);
-  render(cardListElement, filmComponent.element, RenderPosition.BEFOREEND);
+  filmComponent.setCardClickHandler(() => {
+    onGetFormCardInfoClick();
+  });
+  render(cardListElement, filmComponent, RenderPosition.BEFOREEND);
 };
 
-render(siteHeaderElement, new ProfileView(films).element, RenderPosition.BEFOREEND);
-render(siteMainElement, new NavigationView(filters).element, RenderPosition.BEFOREEND);
-render(siteMainElement, new SortView().element, RenderPosition.BEFOREEND);
+render(siteHeaderElement, new ProfileView(films), RenderPosition.BEFOREEND);
+render(siteMainElement, new NavigationView(filters), RenderPosition.BEFOREEND);
+render(siteMainElement, new SortView(), RenderPosition.BEFOREEND);
 
-const boardComponent = new BoardFilmsView().element;
+const boardComponent = new BoardFilmsView();
 render(siteMainElement, boardComponent, RenderPosition.BEFOREEND);
 
-const filmListComponent = new FilmsListView().element;
+const filmListComponent = new FilmsListView();
 render(boardComponent, filmListComponent, RenderPosition.BEFOREEND);
 
 if (films.length < 1) {
-  render(filmListComponent, new NoCardsView().element, RenderPosition.BEFOREEND);
+  render(filmListComponent, new NoCardsView(), RenderPosition.BEFOREEND);
 }
 
-const filmsContainerComponent = new FilmsContainerView().element;
+const filmsContainerComponent = new FilmsContainerView();
 render(filmListComponent, filmsContainerComponent, RenderPosition.BEFOREEND);
 
 for (let i = 0; i < Math.min(films.length, CARD_COUNT_PER_STEP); i++) {
@@ -82,10 +84,9 @@ if (films.length > CARD_COUNT_PER_STEP) {
   let renderedTaskCount = CARD_COUNT_PER_STEP;
   const loadMoreButtonComponent = new ButtonShowMoreView();
 
-  render(boardComponent, loadMoreButtonComponent.element, RenderPosition.BEFOREEND);
+  render(boardComponent, loadMoreButtonComponent, RenderPosition.BEFOREEND);
 
-  loadMoreButtonComponent.element.addEventListener('click', (evt) => {
-    evt.preventDefault();
+  loadMoreButtonComponent.setClickHandler(() => {
     films
       .slice(renderedTaskCount, renderedTaskCount + CARD_COUNT_PER_STEP)
       .forEach((film) => renderFilmInfo(filmsContainerComponent, film));
@@ -93,8 +94,7 @@ if (films.length > CARD_COUNT_PER_STEP) {
     renderedTaskCount += CARD_COUNT_PER_STEP;
 
     if (renderedTaskCount >= films.length) {
-      loadMoreButtonComponent.element.remove();
-      loadMoreButtonComponent.removeElement();
+      remove(loadMoreButtonComponent);
     }
   });
 }
@@ -118,6 +118,6 @@ if (films.length > 1) {
 }
 
 
-render(footer, new FooterView(films).element, RenderPosition.BEFOREEND);
+render(footer, new FooterView(films), RenderPosition.BEFOREEND);
 
 
