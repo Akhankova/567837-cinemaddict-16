@@ -1,19 +1,10 @@
 import ProfileView from './view/profile-view.js';
-import { RenderPosition, render, remove } from './render.js';
+import { RenderPosition, render } from './render.js';
 import NavigationView from './view/navigation-view';
-import SortView from './view/sort-view';
-import BoardFilmsView from './view/board-films-views';
-import FilmsListView from './view/films-list-view';
-import FilmsContainerView from './view/films-container-views';
-import ButtonShowMoreView from './view/show-more-button-views';
-import FilmsListTopRatedExtraView from './view/films-list-extra-views-top-rated';
-import FilmsListExtraMostCommentedView from './view/films-list-extra-most-commented';
-import FilmInfotmationView from './view/film-information';
 import FooterView from './view/footer-views';
-import NoCardsView from './view/no-cards-view';
-import CardFilmView from './view/card-film-views';
 import { getCreateFilmCard, generateFilter } from './mock/card.js';
-import { CARD_COUNT, CARD_COUNT_COMMENTED, CARD_COUNT_RATING, CARD_COUNT_PER_STEP } from './consts';
+import { CARD_COUNT } from './consts';
+import MovieListPresenter from './presenter/movie-list-presenter';
 
 const films = Array.from({ length: CARD_COUNT }, getCreateFilmCard);
 const filters = generateFilter(films);
@@ -21,9 +12,11 @@ const filters = generateFilter(films);
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const footer = document.querySelector('.footer');
-const bodyElement = document.querySelector('body');
+//const bodyElement = document.querySelector('body');
 
-const renderFilmInfo = (cardListElement, card) => {
+const boardPresenter = new MovieListPresenter(siteMainElement);
+
+/*const renderFilmInfo = (cardListElement, card) => {
   const filmComponent = new CardFilmView(card);
   const filmEditComponent = new FilmInfotmationView(card);
 
@@ -57,13 +50,12 @@ const renderFilmInfo = (cardListElement, card) => {
     onGetFormCardInfoClick();
   });
   render(cardListElement, filmComponent, RenderPosition.BEFOREEND);
-};
+};*/
 
 render(siteHeaderElement, new ProfileView(films), RenderPosition.BEFOREEND);
 render(siteMainElement, new NavigationView(filters), RenderPosition.BEFOREEND);
-render(siteMainElement, new SortView(), RenderPosition.BEFOREEND);
 
-const boardComponent = new BoardFilmsView();
+/*const boardComponent = new BoardFilmsView();
 render(siteMainElement, boardComponent, RenderPosition.BEFOREEND);
 
 const filmListComponent = new FilmsListView();
@@ -115,9 +107,9 @@ if (films.length > 1) {
   for (let i = 0; i < CARD_COUNT_RATING; i++) {
     renderFilmInfo(mostCommented, films[i]);
   }
-}
+}*/
 
 
 render(footer, new FooterView(films), RenderPosition.BEFOREEND);
 
-
+boardPresenter.init(films);
