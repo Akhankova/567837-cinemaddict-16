@@ -9,6 +9,7 @@ import AbstractView from './abstract-view.js';
 const createCardFilmTemplate = (card) => {
   const {title, totalRating, genre, runtime, poster, descriptionCard, comments, releaseDate, isWatchlist, isWatched, isFavorites} = card;
   const filmRuntime = getTime(runtime);
+
   const washListClassName = isWatchlist
     ? 'film-card__controls-item film-card__controls-item--add-to-watchlist film-card__controls-item--active'
     : 'film-card__controls-item film-card__controls-item--add-to-watchlist';
@@ -66,5 +67,34 @@ export default class CardFilmView extends AbstractView {
     this._callback.editClick();
   }
 
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#favoriteClickHandler);
+  }
+
+  setHistoryClickHandler = (callback) => {
+    this._callback.watchedClick = callback;
+    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#watchedClickHandler);
+  }
+
+  setWatchlistClickHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#watchlistClickHandler);
+  }
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  #watchedClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  }
+
+  #watchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  }
 }
 
