@@ -3,12 +3,12 @@ import SortView from '../view/sort-view';
 import FilmsListView from '../view/films-list-view';
 import FilmsContainerView from '../view/films-container-views';
 import NoCardsView from '../view/no-cards-view';
-import { CARD_COUNT_PER_STEP } from '../consts';
+import { CARD_COUNT_PER_STEP, SortType } from '../consts';
 import ButtonShowMoreView from '../view/show-more-button-views';
 import FilmsListTopRatedExtraView from '../view/films-list-extra-views-top-rated';
 import FilmsListExtraMostCommentedView from '../view/films-list-extra-most-commented';
 import MoviePresenter from './movie-presenter';
-import { RenderPosition, render, remove, updateItem } from '../render';
+import { RenderPosition, render, remove, updateItem, getSortRateCard, getSortDateCard } from '../render';
 
 
 export default class MovieListPresenter {
@@ -25,6 +25,8 @@ export default class MovieListPresenter {
 
   #boardFilms = [];
   #renderedFilmCount = CARD_COUNT_PER_STEP;
+  #currentSortType = SortType.DEFAULT;
+  #sourcedBoardCards = [];
   #filmPresenter = new Map();
   #filmCardTopRatedPresenters = new Map();
   #filmCardMostCommentedPresenters = new Map();
@@ -35,6 +37,7 @@ export default class MovieListPresenter {
 
   init = (boardFilms) => {
     this.#boardFilms = [...boardFilms];
+    this.#sourcedBoardCards = [...boardFilms];
 
     render(this.#boardContainer, this.#boardComponent, RenderPosition.BEFOREEND);
     render(this.#boardComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
@@ -44,15 +47,11 @@ export default class MovieListPresenter {
   }
 
   #handleCardChange = (updatedFilm) => {
-    /*this.#boardFilms = updateItem(this.#boardFilms, updatedFilm);
-    this.#filmPresenter.get(updatedFilm.id).init(updatedFilm);
-    this.#filmCardTopRatedPresenters.get(updatedFilm.id).init(updatedFilm);
-    this.#filmCardMostCommentedPresenters.get(updatedFilm.id).init(updatedFilm);*/
 
     const filmCardPresenter = this.#filmPresenter.get(updatedFilm.id);
     const filmCardTopRatedPresenter = this.#filmCardTopRatedPresenters.get(updatedFilm.id);
     const filmCardMostCommentedPresenter = this.#filmCardMostCommentedPresenters.get(updatedFilm.id);
-
+    this.#sourcedBoardCards = updateItem(this.#sourcedBoardCards, updatedFilm);
     this.#boardFilms = updateItem(this.#boardFilms, updatedFilm);
 
     if (filmCardPresenter !== undefined) {
@@ -66,12 +65,38 @@ export default class MovieListPresenter {
     }
   }
 
+  #sortCards = (sortType) => {
+    switch (sortType) {
+      case SortType.RATING_SORT:
+        this.#boardFilms.sort(getSortRateCard);
+        break;
+      case SortType.DATE_SORT:
+        this.#boardFilms.sort(getSortDateCard);
+        break;
+      default:
+        this.#boardFilms = [...this.#sourcedBoardCards];
+    }
+
+    this.#currentSortType = sortType;
+  }
+
   #handleModeChange = () => {
     this.#filmPresenter.forEach((presenter) => presenter.resetView());
   }
 
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortCards(sortType);
+    this.#clearFilmList();
+    this.#renderFilmList();
+  }
+
   #renderSort = () => {
     render(this.#boardComponent, this.#sortComponent, RenderPosition.AFTERBEGIN);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   }
 
   #renderFilm = (place, card) => {
