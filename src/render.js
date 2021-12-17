@@ -31,6 +31,9 @@ export const render = (container, element, place) => {
   }
 };
 
+export const getSortRateCard = (cardA, cardB) => cardB.totalRating - cardA.totalRating;
+export const getSortDateCard = (a, b) => new Date(b.filmDate) - new Date(a.filmDate);
+
 export const createElement = (template) => {
   const newElement = document.createElement('div');
   newElement.innerHTML = template;
