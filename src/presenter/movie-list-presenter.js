@@ -13,10 +13,11 @@ import { RenderPosition, render, remove, updateItem, getSortRateCard, getSortDat
 
 export default class MovieListPresenter {
   #boardContainer = null;
+  #sortComponent = null;
 
   #boardComponent = new BoardFilmsView();
   #filmsContainerComponent = new FilmsContainerView();
-  #sortComponent = new SortView();
+  //#sortComponent = new SortView();
   #filmsListComponent = new FilmsListView();
   #noCardComponent = new NoCardsView();
   #filmsListTopRatedExtraView = new FilmsListTopRatedExtraView();
@@ -69,9 +70,11 @@ export default class MovieListPresenter {
     switch (sortType) {
       case SortType.RATING_SORT:
         this.#boardFilms.sort(getSortRateCard);
+        this.#currentSortType = sortType;
         break;
       case SortType.DATE_SORT:
         this.#boardFilms.sort(getSortDateCard);
+        this.#currentSortType = sortType;
         break;
       default:
         this.#boardFilms = [...this.#sourcedBoardCards];
@@ -88,15 +91,20 @@ export default class MovieListPresenter {
     if (this.#currentSortType === sortType) {
       return;
     }
-
     this.#sortCards(sortType);
+    remove(this.#sortComponent);
+    this.#renderSort();
     this.#clearFilmList();
     this.#renderFilmList();
   }
 
   #renderSort = () => {
-    render(this.#boardComponent, this.#sortComponent, RenderPosition.AFTERBEGIN);
+    if (this.#sortComponent !== null) {
+      this.#sortComponent = null;
+    }
+    this.#sortComponent = new SortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    render(this.#boardComponent, this.#sortComponent, RenderPosition.AFTERBEGIN);
   }
 
   #renderFilm = (place, card) => {
