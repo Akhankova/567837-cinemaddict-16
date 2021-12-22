@@ -1,4 +1,4 @@
-import he from 'he';
+//import he from 'he';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -126,7 +126,7 @@ const createFilmInformationTemplate = (data) => {
           alt="emoji" width="55" height="55" value="${commentEmotion !== undefined ? commentEmotion : ' '}">` : ' ' }
           </div>
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(commentText !== undefined ? commentText : '')}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText !== undefined ? commentText : ''}</textarea>
           </label>
           <div class="film-details__emoji-list">
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
@@ -157,7 +157,7 @@ export default class FilmInfotmationView extends SmartView {
 
   constructor(film) {
     super();
-    this._data = film;
+    this._data = FilmInfotmationView.parseFilmToData(film);
 
     this.#setInnerHandlers();
   }
@@ -170,8 +170,8 @@ export default class FilmInfotmationView extends SmartView {
     this.setEditClickHandler(this._callback.editClick);
     this.setHistoryClickHandler(this._callback.watchedClick);
     this.setWatchlistClickHandler(this._callback.watchlistClick);
-    this.setEmotionClickHandler();
     this.setFavoriteClickHandler(this._callback.favoriteClick );
+    this.#setInnerHandlers();
   }
 
   #setInnerHandlers = () => {
@@ -231,7 +231,6 @@ export default class FilmInfotmationView extends SmartView {
   }
 
   #emotionClickHandler = (evt) => {
-    evt.preventDefault();
     this.updateData({
       commentEmotion: evt.target.value,
     });
@@ -244,5 +243,6 @@ export default class FilmInfotmationView extends SmartView {
     }, true);
   }
 
+  static parseFilmToData = (film) => ({ ...film, commentText: '', commentEmotion: ' ' });
 }
 

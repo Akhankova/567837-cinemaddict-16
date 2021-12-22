@@ -71,7 +71,7 @@ export default class MoviePresenter {
 
   #onReplaceFormCardInfoClick = () => {
     bodyElement.classList.remove('hide-overflow');
-    remove(this.#filmEditComponent);
+    this.#filmEditComponent.element.remove();
     this.#mode = Mode.DEFAULT;
     this.#filmEditComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#filmEditComponent.setHistoryClickHandler(this.#handleHistoryClick);
