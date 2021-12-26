@@ -1,6 +1,7 @@
 import FilmInfotmationView from '../view/film-information';
 import { render, RenderPosition, remove, replace } from '../render';
 import CardFilmView from '../view/card-film-views';
+import {UserAction, UpdateType} from '../consts';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -116,14 +117,23 @@ export default class MoviePresenter {
   }
 
   #handleFavoriteClick = () => {
-    this.#changeData({ ...this.#film, isFavorites: !this.#film.isFavorites});
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
+      { ...this.#film, isFavorites: !this.#film.isFavorites});
   }
 
   #handleHistoryClick = () => {
-    this.#changeData({ ...this.#film, isWatched: !this.#film.isWatched });
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
+      { ...this.#film, isWatched: !this.#film.isWatched });
   }
 
   #handleWatchlistClick = () => {
-    this.#changeData({ ...this.#film, isWatchlist: !this.#film.isWatchlist });
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
+      { ...this.#film, isWatchlist: !this.#film.isWatchlist });
   }
 }

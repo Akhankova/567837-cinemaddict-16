@@ -1,17 +1,19 @@
 import AbstractView from './abstract-view.js';
 
-const createFilterItemTemplate = (filter) => {
+const createFilterItemTemplate = (filter, currentFilterType) => {
   const { name, count } = filter;
+  // eslint-disable-next-line no-console
+  console.log(currentFilterType);
   return (
     `
-    <a href="#${name}" class="main-navigation__item main-navigation__item--active">${name !== 'All' ? name : `${name} movies`}<span class="main-navigation__item-count">${count}</span></a>
+    <a href="#${name}" name='${name}' class="main-navigation__item ${name === currentFilterType ? 'main-navigation__item--active' : ''}">${name !== 'All' ? name : `${name} movies`}<span class="main-navigation__item-count">${count}</span></a>
     `
   );
 };
 
-const createMainNavigation = (filterItems) => {
+const createMainNavigation = (filterItems, currentFilterType) => {
   const filterItemsTemplate = filterItems
-    .map((filter, index) => createFilterItemTemplate(filter, index === 0))
+    .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('');
 
   return (
@@ -24,16 +26,33 @@ const createMainNavigation = (filterItems) => {
   );
 };
 
-export default class NavigationView extends AbstractView{
+export default class NavigationView extends AbstractView {
   #filters = null;
+  #currentFilter = null;
 
-  constructor(filters) {
+  constructor(filters, currentFilterType) {
     super();
     this.#filters = filters;
+    this.#currentFilter = currentFilterType;
   }
 
   get template() {
-    return createMainNavigation(this.#filters);
+    return createMainNavigation(this.#filters, this.#currentFilter);
+  }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    // eslint-disable-next-line no-console
+    console.log(this.element);
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
+  }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.tagName === 'SPAN') {
+      return;
+    }
+    this._callback.filterTypeChange(evt.target.name);
   }
 
 }
