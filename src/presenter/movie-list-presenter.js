@@ -17,7 +17,6 @@ export default class MovieListPresenter {
 
   #boardComponent = new BoardFilmsView();
   #filmsContainerComponent = new FilmsContainerView();
-  //#sortComponent = new SortView();
   #filmsListComponent = new FilmsListView();
   #noCardComponent = new NoCardsView();
   #filmsListTopRatedExtraView = new FilmsListTopRatedExtraView();

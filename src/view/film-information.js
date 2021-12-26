@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
-import {getTime} from '../utils.js';
+import { getTime } from '../utils.js';
 import SmartView from './smart-view.js';
 
 const creatCommentCountTemplate = (comments) => comments > 0 ? `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>` : ' ';
@@ -34,7 +34,7 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
 const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment));
 
 const createFilmInformationTemplate = (data) => {
-  const {title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentsText, commentText, commentEmotion, comments} = data;
+  const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentsText, commentText, commentEmotion, comments } = data;
   const filmRuntime = getTime(runtime);
   const washListClassName = isWatchlist
     ? 'film-details__control-button film-details__control-button--watchlist film-details__control-button--active'
@@ -122,8 +122,8 @@ const createFilmInformationTemplate = (data) => {
         </ul>
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-          ${(commentEmotion !== undefined &&  commentEmotion !== ' ') ? `<img src="/images/emoji/${commentEmotion}.png"
-          alt="emoji" width="55" height="55" value="${commentEmotion !== undefined ? commentEmotion : ' '}">` : ' ' }
+          ${(commentEmotion !== undefined && commentEmotion !== ' ') ? `<img src="/images/emoji/${commentEmotion}.png"
+          alt="emoji" width="55" height="55" value="${commentEmotion !== undefined ? commentEmotion : ' '}">` : ' '}
           </div>
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText !== undefined ? commentText : ''}</textarea>
@@ -158,7 +158,6 @@ export default class FilmInfotmationView extends SmartView {
   constructor(film) {
     super();
     this._data = FilmInfotmationView.parseFilmToData(film);
-
     this.#setInnerHandlers();
   }
 
@@ -166,11 +165,16 @@ export default class FilmInfotmationView extends SmartView {
     return createFilmInformationTemplate(this._data);
   }
 
+  reset = (film) => {
+    this._data = FilmInfotmationView.parseFilmToData({ ...film });
+    this.updateData(this._data);
+  }
+
   restoreHandlers = () => {
     this.setEditClickHandler(this._callback.editClick);
     this.setHistoryClickHandler(this._callback.watchedClick);
     this.setWatchlistClickHandler(this._callback.watchlistClick);
-    this.setFavoriteClickHandler(this._callback.favoriteClick );
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.#setInnerHandlers();
   }
 
@@ -182,6 +186,10 @@ export default class FilmInfotmationView extends SmartView {
   setEditClickHandler = (callback) => {
     this._callback.editClick = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#editClickHandler);
+  }
+
+  setInputChangeHandler = (callback) => {
+    this._callback.changeInput = callback;
   }
 
   #editClickHandler = (evt) => {
@@ -243,6 +251,9 @@ export default class FilmInfotmationView extends SmartView {
     }, true);
   }
 
-  static parseFilmToData = (film) => ({ ...film, commentText: '', commentEmotion: ' ' });
+  static parseFilmToData = (data) => {
+    const film = { ...data, commentText: '', commentEmotion: ' ' };
+    return film;
+  }
 }
 

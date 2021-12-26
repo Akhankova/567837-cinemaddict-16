@@ -71,12 +71,9 @@ export default class MoviePresenter {
 
   #onReplaceFormCardInfoClick = () => {
     bodyElement.classList.remove('hide-overflow');
-    this.#filmEditComponent.element.remove();
     this.#mode = Mode.DEFAULT;
-    this.#filmEditComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
-    this.#filmEditComponent.setHistoryClickHandler(this.#handleHistoryClick);
-    this.#filmEditComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
-    this.#filmEditComponent.setEditClickHandler(this.#handleEditClick);
+    this.#filmEditComponent.reset(this.#film);
+    this.#filmEditComponent.element.remove();
   };
 
   #onEscKeyDown = (evt) => {
@@ -85,8 +82,6 @@ export default class MoviePresenter {
       bodyElement.classList.remove('hide-overflow');
       this.#onReplaceFormCardInfoClick();
       document.removeEventListener('keydown', this.#onEscKeyDown);
-      this.#filmEditComponent.setEditClickHandler(this.#handleEditClick);
-      this.#mode = Mode.DEFAULT;
     }
   };
 
@@ -99,10 +94,15 @@ export default class MoviePresenter {
     document.addEventListener('keydown', this.#onEscKeyDown);
     this.#changeMode();
     this.#mode = Mode.EDITING;
+    this.#filmEditComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#filmEditComponent.setHistoryClickHandler(this.#handleHistoryClick);
+    this.#filmEditComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#filmEditComponent.setEditClickHandler(this.#handleEditClick);
   };
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#filmEditComponent.reset(this.#film);
       this.#onReplaceFormCardInfoClick();
     }
   }
@@ -116,7 +116,7 @@ export default class MoviePresenter {
   }
 
   #handleFavoriteClick = () => {
-    this.#changeData({ ...this.#film, isFavorites: !this.#film.isFavorites });
+    this.#changeData({ ...this.#film, isFavorites: !this.#film.isFavorites});
   }
 
   #handleHistoryClick = () => {
@@ -126,5 +126,4 @@ export default class MoviePresenter {
   #handleWatchlistClick = () => {
     this.#changeData({ ...this.#film, isWatchlist: !this.#film.isWatchlist });
   }
-
 }
