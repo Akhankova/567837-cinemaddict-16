@@ -213,10 +213,7 @@ export default class FilmInfotmationView extends SmartView {
   }
 
   setEmotionClickHandler = () => {
-    const emojiItems = this.element.querySelectorAll('.film-details__emoji-item');
-    emojiItems.forEach((element) => {
-      element.addEventListener('click', this.#emotionClickHandler);
-    });
+    this.element.querySelector('.film-details__emoji-list').addEventListener('change', this.#emotionClickHandler);
   };
 
   setCommentInputHandler = () => {
@@ -239,6 +236,7 @@ export default class FilmInfotmationView extends SmartView {
   }
 
   #emotionClickHandler = (evt) => {
+    evt.preventDefault();
     this.updateData({
       commentEmotion: evt.target.value,
     });
