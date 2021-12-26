@@ -3,7 +3,7 @@ import SortView from '../view/sort-view';
 import FilmsListView from '../view/films-list-view';
 import FilmsContainerView from '../view/films-container-views';
 import NoCardsView from '../view/no-cards-view';
-import { CARD_COUNT_PER_STEP, SortType, UpdateType, UserAction } from '../consts';
+import { CARD_COUNT_PER_STEP, SortType, UpdateType, UserAction, FilterType } from '../consts';
 import ButtonShowMoreView from '../view/show-more-button-views';
 import FilmsListTopRatedExtraView from '../view/films-list-extra-views-top-rated';
 import FilmsListExtraMostCommentedView from '../view/films-list-extra-most-commented';
@@ -16,23 +16,23 @@ export default class MovieListPresenter {
   #boardContainer = null;
   #filmsModel = null;
   #filterModel = null;
+  #noCardComponent = null;
 
   #boardComponent = new BoardFilmsView();
   #filmsContainerComponent = new FilmsContainerView();
   #filmsListComponent = new FilmsListView();
-  #noCardComponent = new NoCardsView();
+
   #filmsListTopRatedExtraView = new FilmsListTopRatedExtraView();
   #filmsListExtraMostCommentedView = new FilmsListExtraMostCommentedView();
   #sortComponent = null;
   #loadMoreButtonComponent = null;
 
-  //#boardFilms = [];
   #renderedFilmCount = CARD_COUNT_PER_STEP;
   #currentSortType = SortType.DEFAULT;
-  //#sourcedBoardCards = [];
   #filmPresenter = new Map();
   #filmCardTopRatedPresenters = new Map();
   #filmCardMostCommentedPresenters = new Map();
+  #filterType = FilterType.ALL;
 
   constructor(boardContainer, filmsModel, filterModel) {
     this.#boardContainer = boardContainer;
@@ -44,9 +44,9 @@ export default class MovieListPresenter {
   }
 
   get films() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const films = this.#filmsModel.films;
-    const filteredFilms = filter[filterType](films);
+    const filteredFilms = filter[this.#filterType](films);
     switch (this.#currentSortType) {
       case SortType.RATING_SORT:
         return filteredFilms.sort(getSortRateCard);
@@ -173,6 +173,7 @@ export default class MovieListPresenter {
   }
 
   #renderNoFilms = () => {
+    this.#noCardComponent = new NoCardsView(this.#filterType);
     render(this.#boardComponent, this.#noCardComponent, RenderPosition.BEFOREEND);
   }
 
@@ -218,8 +219,11 @@ export default class MovieListPresenter {
     this.#filmPresenter.clear();
 
     remove(this.#sortComponent);
-    remove(this.#noCardComponent);
     remove(this.#loadMoreButtonComponent);
+
+    if (this.#noCardComponent) {
+      remove(this.#noCardComponent);
+    }
 
     if (resetRenderedCardCount) {
       this.#renderedFilmCount = CARD_COUNT_PER_STEP;

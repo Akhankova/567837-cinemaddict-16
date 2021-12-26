@@ -1,4 +1,4 @@
-//import he from 'he';
+import he from 'he';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -128,7 +128,7 @@ const createFilmInformationTemplate = (data) => {
           alt="emoji" width="55" height="55" value="${commentEmotion !== undefined ? commentEmotion : ' '}">` : ' '}
           </div>
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText !== undefined ? commentText : ''}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText !== undefined ? he.encode(commentText) : ''}</textarea>
           </label>
           <div class="film-details__emoji-list">
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
