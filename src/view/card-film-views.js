@@ -1,4 +1,4 @@
-import {getTime} from '../utils.js';
+import {getTime, createMessageCard} from '../utils.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -7,8 +7,10 @@ dayjs.extend(relativeTime);
 import AbstractView from './abstract-view.js';
 
 const createCardFilmTemplate = (card) => {
-  const {title, totalRating, genre, runtime, poster, descriptionCard, comments, releaseDate, isWatchlist, isWatched, isFavorites} = card;
+  const {title, totalRating, genre, runtime, poster, description, comments, filmDate, isWatchlist, isWatched, isFavorites} = card;
+  const date = dayjs(filmDate).format('YYYY');
   const filmRuntime = getTime(runtime);
+  const descriptionCard = createMessageCard(description);
 
   const washListClassName = isWatchlist
     ? 'film-card__controls-item film-card__controls-item--add-to-watchlist film-card__controls-item--active'
@@ -28,7 +30,7 @@ const createCardFilmTemplate = (card) => {
     <h3 class="film-card__title">${title}</h3>
     <p class="film-card__rating">${totalRating}</p>
     <p class="film-card__info">
-      <span class="film-card__year">${releaseDate}</span>
+      <span class="film-card__year">${date}</span>
       <span class="film-card__duration">${filmRuntime}</span>
       <span class="film-card__genre">${genre.join(', ')}</span>
     </p>
