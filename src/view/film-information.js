@@ -36,6 +36,8 @@ const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((c
 const createFilmInformationTemplate = (data) => {
   const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentsText, commentText, commentEmotion, comments } = data;
   const filmRuntime = getTime(runtime);
+  const date = filmDate.format('DD MMMM YYYY');
+
   const washListClassName = isWatchlist
     ? 'film-details__control-button film-details__control-button--watchlist film-details__control-button--active'
     : 'film-details__control-button film-details__control-button--watchlist';
@@ -86,7 +88,7 @@ const createFilmInformationTemplate = (data) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${filmDate}</td>
+              <td class="film-details__cell">${date}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>

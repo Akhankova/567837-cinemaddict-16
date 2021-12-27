@@ -23,8 +23,6 @@ const DAY_MIN = -29;
 const DAY_MAX = 0;
 const GENRE_MIN = 1;
 const GENRE_MAX = 3;
-const DESCRIPTION_LENGTH = 140;
-const DESCRIPTION_LENGTH_SHOW = 139;
 const AFTER_COMMA = 1;
 const BOOLEAN_MIN = 0;
 const BOOLEAN_MAX = 1;
@@ -180,14 +178,6 @@ const createDescriptionPopup = () => {
   return text.join(' ');
 };
 
-const createMessageCard = (text) => {
-  if (text.length >= DESCRIPTION_LENGTH) {
-    text = `${text.substr(0, DESCRIPTION_LENGTH_SHOW)}...`;
-    return text;
-  }
-  return text;
-};
-
 const getActor = () => {
   const actorsCount = getRandomValue(ACTOR_MIN_COUNT, ACTOR_MAX_COUNT );
   const actors = [
@@ -224,8 +214,7 @@ const getCreateFilmCard = () => {
 
   const index = getRandomValue(CARD_INDEX_MIN, CARD_INDEX_MAX);
   const textDescription = createDescriptionPopup();
-  const date = dayjs(getRandomDate()).format('DD MMMM YYYY');
-  const date2 = dayjs(date).format('YYYY');
+  const date = dayjs(getRandomDate());
   const title = filmsNames[index];
   const commentsCount = getRandomValue(COMMENTS_LANGTH_MIN, COMMENTS_LANGTH_MAX);
   const commentsText = new Array(commentsCount).fill().map(getCommentText);
@@ -245,12 +234,10 @@ const getCreateFilmCard = () => {
     actors: [
       getActor(),
     ],
-    releaseDate: date2,
     filmDate: date,
     releaseCountry: countrys[getRandomValue(COUNTRYS_MIN, COUNTRYS_MAX)],
     runtime: getRandomValue(TIME_MINUTE_MIN, TIME_MINUTE_MAX),
     genre: generateGenre(),
-    descriptionCard: createMessageCard(textDescription),
     description:  textDescription,
     comments: commentsText.length,
     commentsText: commentsText,
