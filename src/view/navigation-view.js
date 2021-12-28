@@ -2,8 +2,6 @@ import AbstractView from './abstract-view.js';
 
 const createFilterItemTemplate = (filter, currentFilterType) => {
   const { name, count } = filter;
-  // eslint-disable-next-line no-console
-  console.log(currentFilterType);
   return (
     `
     <a href="#${name}" name='${name}' class="main-navigation__item ${name === currentFilterType ? 'main-navigation__item--active' : ''}">${name !== 'All' ? name : `${name} movies`}<span class="main-navigation__item-count">${count}</span></a>
@@ -42,8 +40,6 @@ export default class NavigationView extends AbstractView {
 
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
-    // eslint-disable-next-line no-console
-    console.log(this.element);
     this.element.addEventListener('click', this.#filterTypeChangeHandler);
   }
 

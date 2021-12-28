@@ -6,6 +6,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import { getTime } from '../utils.js';
 import SmartView from './smart-view.js';
+import {nanoid} from 'nanoid';
 
 const creatCommentCountTemplate = (comments) => comments > 0 ? `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>` : ' ';
 const createFilmPopupCommentsTemplate = (commentLi) => {
@@ -14,7 +15,7 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
     author,
     comment,
     dateComment,
-    emotion,
+    emotion
   } = commentLi;
   return (
     `<li class="film-details__comment" id="${id}">
@@ -34,7 +35,7 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
 const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment));
 
 const createFilmInformationTemplate = (data) => {
-  const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentsText, commentText, commentEmotion, comments } = data;
+  const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentsText, commentText, commentEmotion } = data;
   const filmRuntime = getTime(runtime);
   const date = filmDate.format('DD MMMM YYYY');
 
@@ -118,7 +119,7 @@ const createFilmInformationTemplate = (data) => {
     </div>
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        ${creatCommentCountTemplate(comments)}
+        ${creatCommentCountTemplate(commentsText.length)}
         <ul class="film-details__comments-list">
         ${createFilmPopupAllCommentsTemplate(commentsText)}
         </ul>
@@ -177,6 +178,9 @@ export default class FilmInfotmationView extends SmartView {
     this.setHistoryClickHandler(this._callback.watchedClick);
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this.setAddClickHandler(this._callback.deleteClick);
+
     this.#setInnerHandlers();
   }
 
@@ -221,6 +225,65 @@ export default class FilmInfotmationView extends SmartView {
   setCommentInputHandler = () => {
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
   };
+
+  setAddClickHandler = (callback) => {
+    const filmDetails = document.querySelector('.film-details');
+    this._callback.addClick = callback;
+    if (filmDetails) {
+      document.addEventListener('keypress', this.#formAddClickHandler);
+    }
+  }
+
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelectorAll('.film-details__comment').forEach((element) => {
+      element.addEventListener('click', this.#formDeleteClickHandler);
+    });
+  }
+
+  createNewComment () {
+    return {
+      id: nanoid(),
+      author: 'Alex Ivanov',
+      comment: he.encode(this._data.commentText),
+      dateComment: dayjs().fromNow(),
+      emotion: `./images/emoji/${this._data.commentEmotion}.png`,
+    };
+  }
+
+  #formAddClickHandler = (evt) => {
+    if (evt.keyCode === 13 && (evt.metaKey || evt.ctrlKey) && (evt.keyCode === 13 || evt.keyCode === 10) && (evt.metaKey || evt.ctrlKey)) {
+      if (this._data.commentEmotion !== ' ' && this._data.commentText !== '') {
+        const newComment = this.createNewComment();
+        this._data.commentsText.push(newComment);
+        const scrollPosit = this.element.scrollTop;
+
+        document.querySelector('.film-details').scrollTop = scrollPosit;
+        document.removeEventListener('keypress', this.#formAddClickHandler);
+        this._data.commentText = '';
+        this._data.commentEmotion = '';
+        const filmCommentDelete = this.element.querySelectorAll('.film-details__comment');
+        filmCommentDelete[filmCommentDelete.length - 1].addEventListener('click', this.#formDeleteClickHandler);
+        this._callback.addClick(FilmInfotmationView.parseFilmToData(this._data), newComment);
+      }
+    }
+  }
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.tagName !== 'BUTTON') {
+      return;
+    }
+    const arrayIndexes = [];
+    this._data.commentsText.forEach((comment) => arrayIndexes.push(comment.id));
+    const index = arrayIndexes.indexOf(evt.currentTarget.id);
+    this._data.commentsText = [
+      ...this._data.commentsText.slice(0, index),
+      ...this._data.commentsText.slice(index + 1),
+    ];
+    this._data.comments = this._data.comments - 1;
+    this._callback.deleteClick(FilmInfotmationView.parseFilmToData(this._data), evt.currentTarget.id);
+  }
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();

@@ -7,7 +7,7 @@ dayjs.extend(relativeTime);
 import AbstractView from './abstract-view.js';
 
 const createCardFilmTemplate = (card) => {
-  const {title, totalRating, genre, runtime, poster, description, comments, filmDate, isWatchlist, isWatched, isFavorites} = card;
+  const {title, totalRating, genre, runtime, poster, description, commentsText, filmDate, isWatchlist, isWatched, isFavorites} = card;
   const date = dayjs(filmDate).format('YYYY');
   const filmRuntime = getTime(runtime);
   const descriptionCard = createMessageCard(description);
@@ -36,7 +36,7 @@ const createCardFilmTemplate = (card) => {
     </p>
     <img src="${poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${descriptionCard}</p>
-    <span class="film-card__comments">${comments} comments</span>
+    <span class="film-card__comments">${commentsText.length} comments</span>
     </a>
     <div class="film-card__controls">
       <button class="${washListClassName}" type="button">Add to watchlist</button>

@@ -1,7 +1,7 @@
 import FilmInfotmationView from '../view/film-information';
 import { render, RenderPosition, remove, replace } from '../render';
 import CardFilmView from '../view/card-film-views';
-import {UserAction, UpdateType} from '../consts';
+import { UserAction, UpdateType } from '../consts';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -46,6 +46,8 @@ export default class MoviePresenter {
 
     this.#filmComponent.setCardClickHandler(this.#handleCardClick);
     this.#filmEditComponent.setEditClickHandler(this.#handleEditClick);
+    this.#filmEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
+    this.#filmEditComponent.setAddClickHandler(this.#handleAddClick);
 
     if (prevFilmComponent === null || prevFilmEditComponent === null) {
       render(this.#filmListContainer, this.#filmComponent, RenderPosition.BEFOREEND);
@@ -120,7 +122,7 @@ export default class MoviePresenter {
     this.#changeData(
       UserAction.UPDATE_FILM,
       bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
-      { ...this.#film, isFavorites: !this.#film.isFavorites});
+      { ...this.#film, isFavorites: !this.#film.isFavorites });
   }
 
   #handleHistoryClick = () => {
@@ -135,5 +137,23 @@ export default class MoviePresenter {
       UserAction.UPDATE_FILM,
       bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
       { ...this.#film, isWatchlist: !this.#film.isWatchlist });
+  }
+
+  #handleDeleteClick = (film, id) => {
+    this.#changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      film,
+      id
+    );
+  }
+
+  #handleAddClick = (film, comment) => {
+    this.#changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      film,
+      comment
+    );
   }
 }

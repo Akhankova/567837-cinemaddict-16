@@ -15,6 +15,7 @@ import {filter} from '../utils.js';
 export default class MovieListPresenter {
   #boardContainer = null;
   #filmsModel = null;
+  #commentsModel = null;
   #filterModel = null;
   #noCardComponent = null;
 
@@ -34,13 +35,15 @@ export default class MovieListPresenter {
   #filmCardMostCommentedPresenters = new Map();
   #filterType = FilterType.ALL;
 
-  constructor(boardContainer, filmsModel, filterModel) {
+  constructor(boardContainer, filmsModel, filterModel, commentsModel) {
     this.#boardContainer = boardContainer;
     this.#filmsModel = filmsModel;
     this.#filterModel = filterModel;
+    this.#commentsModel = commentsModel;
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
@@ -64,33 +67,16 @@ export default class MovieListPresenter {
     this.#renderBoard();
   }
 
-  /*#handleCardChange = (updatedFilm) => {
-
-    const filmCardPresenter = this.#filmPresenter.get(updatedFilm.id);
-    const filmCardTopRatedPresenter = this.#filmCardTopRatedPresenters.get(updatedFilm.id);
-    const filmCardMostCommentedPresenter = this.#filmCardMostCommentedPresenters.get(updatedFilm.id);
-
-    if (filmCardPresenter !== undefined) {
-      filmCardPresenter.init(updatedFilm);
-    }
-    if (filmCardTopRatedPresenter !== undefined) {
-      filmCardTopRatedPresenter.init(updatedFilm);
-    }
-    if (filmCardMostCommentedPresenter !== undefined) {
-      filmCardMostCommentedPresenter.init(updatedFilm);
-    }
-  }*/
-
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = (actionType, updateType, update, id, newComment) => {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update);
         break;
       case UserAction.ADD_COMMENT:
-        this.#filmsModel.addFilm(updateType, update);
+        this.#commentsModel.addComment(updateType, update, newComment);
         break;
       case UserAction.DELETE_COMMENT:
-        this.#filmsModel.deleteFilm(updateType, update);
+        this.#commentsModel.deleteComment(updateType, update, id);
         break;
     }
   }
@@ -123,8 +109,6 @@ export default class MovieListPresenter {
       return;
     }
     this.#currentSortType = sortType;
-    //remove(this.#sortComponent);
-    //this.#renderSort();
     this.#clearBoard({ resetRenderedCardCount: true });
     this.#renderBoard();
   }
