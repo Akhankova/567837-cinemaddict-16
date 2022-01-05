@@ -14,9 +14,9 @@ export default class TasksModel extends AbstractObservable {
   updateFilm = (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
-    if (index === -1) {
+    /*if (index === -1) {
       throw new Error('Can\'t update unexisting task');
-    }
+    }*/
 
     this.#films = [
       ...this.#films.slice(0, index),

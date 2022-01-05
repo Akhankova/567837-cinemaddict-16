@@ -16,6 +16,13 @@ export const getTime = (runtime) => {
   return hours > 0 ? `${hours}h ${minutes}m` : `$${minutes}m`;
 };
 
+export const getRandomValue = (a = 0, b = 1) => {
+  const lower = Math.ceil(Math.min(a, b));
+  const upper = Math.floor(Math.max(a, b));
+
+  return Math.floor(lower + Math.random() * (upper - lower + 1));
+};
+
 export const createMessageCard = (text) => {
   if (text.length >= DESCRIPTION_LENGTH) {
     text = `${text.substr(0, DESCRIPTION_LENGTH_SHOW)}...`;
@@ -35,8 +42,8 @@ export default class AbstractObservable {
     this.#observers.delete(observer);
   }
 
-  _notify(event, payload, payload2) {
-    this.#observers.forEach((observer) => observer(event, payload, payload2));
+  _notify(event, payload, payload2, payload3) {
+    this.#observers.forEach((observer) => observer(event, payload, payload2, payload3));
   }
 }
 

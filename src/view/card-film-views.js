@@ -6,12 +6,12 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import AbstractView from './abstract-view.js';
 
-const createCardFilmTemplate = (card) => {
-  const {title, totalRating, genre, runtime, poster, description, commentsText, filmDate, isWatchlist, isWatched, isFavorites} = card;
+const createCardFilmTemplate = (card, comments) => {
+  const {title, totalRating, genre, runtime, poster, description, filmDate, isWatchlist, isWatched, isFavorites} = card;
   const date = dayjs(filmDate).format('YYYY');
   const filmRuntime = getTime(runtime);
   const descriptionCard = createMessageCard(description);
-
+  //${commentsText.length}
   const washListClassName = isWatchlist
     ? 'film-card__controls-item film-card__controls-item--add-to-watchlist film-card__controls-item--active'
     : 'film-card__controls-item film-card__controls-item--add-to-watchlist';
@@ -36,7 +36,7 @@ const createCardFilmTemplate = (card) => {
     </p>
     <img src="${poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${descriptionCard}</p>
-    <span class="film-card__comments">${commentsText.length} comments</span>
+    <span class="film-card__comments">${comments.length} comments</span>
     </a>
     <div class="film-card__controls">
       <button class="${washListClassName}" type="button">Add to watchlist</button>
@@ -49,14 +49,16 @@ const createCardFilmTemplate = (card) => {
 
 export default class CardFilmView extends AbstractView {
   #card = null;
+  #comments = null;
 
-  constructor(card) {
+  constructor(card, comments) {
     super();
     this.#card = card;
+    this.#comments = comments;
   }
 
   get template() {
-    return createCardFilmTemplate(this.#card);
+    return createCardFilmTemplate(this.#card, this.#comments);
   }
 
   setCardClickHandler = (callback) => {

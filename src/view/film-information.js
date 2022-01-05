@@ -32,10 +32,11 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
     </div>
     </li>`);
 };
-const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment));
+const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment)).join(' ');
 
-const createFilmInformationTemplate = (data) => {
-  const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentsText, commentText, commentEmotion } = data;
+const createFilmInformationTemplate = (data, comments) => {
+  const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentText, commentEmotion } = data;
+  //commentsText
   const filmRuntime = getTime(runtime);
   const date = filmDate.format('DD MMMM YYYY');
 
@@ -119,9 +120,9 @@ const createFilmInformationTemplate = (data) => {
     </div>
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        ${creatCommentCountTemplate(commentsText.length)}
+        ${creatCommentCountTemplate(comments.length)}
         <ul class="film-details__comments-list">
-        ${createFilmPopupAllCommentsTemplate(commentsText)}
+        ${createFilmPopupAllCommentsTemplate(comments)}
         </ul>
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
@@ -157,20 +158,23 @@ const createFilmInformationTemplate = (data) => {
 };
 
 export default class FilmInfotmationView extends SmartView {
-
-  constructor(film) {
+  #comments = null;
+  constructor(film, comments) {
     super();
     this._data = FilmInfotmationView.parseFilmToData(film);
+    this.#comments = FilmInfotmationView.parseCommentsToData(comments);
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createFilmInformationTemplate(this._data);
+    return createFilmInformationTemplate(this._data, this.#comments);
   }
 
-  reset = (film) => {
-    this._data = FilmInfotmationView.parseFilmToData({ ...film });
+  reset = (film, comments) => {
+    this._data = FilmInfotmationView.parseFilmToData({ ...film});
+    this.#comments = FilmInfotmationView.parseCommentsToData(comments);
     this.updateData(this._data);
+    this.updateData(this.#comments);
   }
 
   restoreHandlers = () => {
@@ -179,7 +183,8 @@ export default class FilmInfotmationView extends SmartView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setDeleteClickHandler(this._callback.deleteClick);
-    this.setAddClickHandler(this._callback.deleteClick);
+    this.setAddClickHandler(this._callback.addClick);
+    this.setCommentsHandler(this._callback.getComments);
 
     this.#setInnerHandlers();
   }
@@ -194,8 +199,8 @@ export default class FilmInfotmationView extends SmartView {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#editClickHandler);
   }
 
-  setInputChangeHandler = (callback) => {
-    this._callback.changeInput = callback;
+  setCommentsHandler = (callback) => {
+    this._callback.getComments = callback;
   }
 
   #editClickHandler = (evt) => {
@@ -255,16 +260,9 @@ export default class FilmInfotmationView extends SmartView {
     if (evt.keyCode === 13 && (evt.metaKey || evt.ctrlKey) && (evt.keyCode === 13 || evt.keyCode === 10) && (evt.metaKey || evt.ctrlKey)) {
       if (this._data.commentEmotion !== ' ' && this._data.commentText !== '') {
         const newComment = this.createNewComment();
-        this._data.commentsText.push(newComment);
-        const scrollPosit = this.element.scrollTop;
-
-        document.querySelector('.film-details').scrollTop = scrollPosit;
-        document.removeEventListener('keypress', this.#formAddClickHandler);
+        this._data.commentEmotion = ' ';
         this._data.commentText = '';
-        this._data.commentEmotion = '';
-        const filmCommentDelete = this.element.querySelectorAll('.film-details__comment');
-        filmCommentDelete[filmCommentDelete.length - 1].addEventListener('click', this.#formDeleteClickHandler);
-        this._callback.addClick(FilmInfotmationView.parseFilmToData(this._data), newComment);
+        this._callback.addClick(FilmInfotmationView.parseFilmToData(this._data), newComment, FilmInfotmationView.parseCommentsToData(this.#comments));
       }
     }
   }
@@ -274,30 +272,23 @@ export default class FilmInfotmationView extends SmartView {
     if (evt.target.tagName !== 'BUTTON') {
       return;
     }
-    const arrayIndexes = [];
-    this._data.commentsText.forEach((comment) => arrayIndexes.push(comment.id));
-    const index = arrayIndexes.indexOf(evt.currentTarget.id);
-    this._data.commentsText = [
-      ...this._data.commentsText.slice(0, index),
-      ...this._data.commentsText.slice(index + 1),
-    ];
-    this._data.comments = this._data.comments - 1;
-    this._callback.deleteClick(FilmInfotmationView.parseFilmToData(this._data), evt.currentTarget.id);
+    const scroll = this.element.scrollTop;
+    this._callback.deleteClick(FilmInfotmationView.parseFilmToData(this._data), evt.currentTarget.id, FilmInfotmationView.parseCommentsToData(this.#comments), scroll);
   }
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.favoriteClick();
+    this._callback.favoriteClick(this.#comments);
   }
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchedClick();
+    this._callback.watchedClick(this.#comments);
   }
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchlistClick();
+    this._callback.watchlistClick(this.#comments);
   }
 
   #emotionClickHandler = (evt) => {
@@ -317,6 +308,11 @@ export default class FilmInfotmationView extends SmartView {
   static parseFilmToData = (data) => {
     const film = { ...data, commentText: '', commentEmotion: ' ' };
     return film;
+  }
+
+  static parseCommentsToData = (newComments) => {
+    const comments = newComments;
+    return comments;
   }
 }
 

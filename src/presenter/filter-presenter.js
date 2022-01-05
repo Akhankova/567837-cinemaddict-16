@@ -66,8 +66,6 @@ export default class FilterPresenter {
   }
 
   #handleFilterTypeChange = (filterType) => {
-    // eslint-disable-next-line no-console
-    console.log(filterType);
     if (this.#filterModel.filter === filterType) {
       return;
     }

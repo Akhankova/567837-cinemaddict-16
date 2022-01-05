@@ -1,40 +1,49 @@
+/* eslint-disable no-console */
 import AbstractObservable from '../utils.js';
 
 export default class CommentsModel extends AbstractObservable {
-  #films = [];
   #filmComments = [];
 
-  set comments(films) {
-    this.#films = [...films];
+  setcomments(comments) {
+    this.#filmComments = [...comments];
   }
 
-  get comments() {
-    return this.#filmComments;
+  getcomments(id) {
+    const currentFilm = this.#filmComments.find((item) => item.id === id);
+    return  currentFilm && currentFilm.comments ? currentFilm.comments : [];
   }
 
-  addComment(updateType, update, innerUpdate) {
-    const index = this.#films.findIndex((film) => film.id === update.id);
+  updateComments = (updateType, update, comments) => {
+    this.#filmComments = comments;
 
-    this.#filmComments[index] = [...this.#filmComments[index], innerUpdate];
-    update.filmComments = this.#filmComments[index];
-    this.#films[index] = update;
-    this._notify(updateType, update);
+    this._notify(updateType, update, this.#filmComments);
   }
 
-  deleteComment(updateType, update, id) {
-    const index = this.#films.findIndex((film) => film.id === update.id);
-    this.#filmComments = this.#films[index].commentsText;
-    const indexComment = this.#filmComments.findIndex((comment) => comment.id === id);
+  addComment(updateType, update, newComment, comments) {
+    this.#filmComments = comments;
+
+    this.#filmComments = [
+      ...this.#filmComments,
+      newComment,
+    ];
+
+    this._notify(updateType, update, this.#filmComments);
+  }
+
+  deleteComment(updateType, update, id, comments, scroll) {
+    this.#filmComments = comments;
+    const index = this.#filmComments.findIndex((comment) => comment.id === id);
+
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
     this.#filmComments = [
-      ...this.#filmComments.slice(0, indexComment),
-      ...this.#filmComments.slice(indexComment + 1),
+      ...this.#filmComments.slice(0, index),
+      ...this.#filmComments.slice(index + 1),
     ];
-
-    this._notify(updateType, update, this.#filmComments);
+    this._notify(updateType, update, this.#filmComments, scroll);
   }
+
 }
 

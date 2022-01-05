@@ -5,8 +5,8 @@ dayjs.extend(duration);
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
-const COMMENTS_LANGTH_MAX = 5;
-const COMMENTS_LANGTH_MIN = 0;
+//const COMMENTS_LANGTH_MAX = 5;
+//const COMMENTS_LANGTH_MIN = 0;
 const DESCRIPTION_MIN = 1;
 const DESCRIPTION_MAX = 5;
 const RATING_MIN = 1;
@@ -31,6 +31,8 @@ const ELEMENT_MAX_VALUE = 6;
 const EMOTION_MAX = 3;
 const ACTOR_MIN_COUNT = 2;
 const ACTOR_MAX_COUNT= 6;
+const MAX_COUNT= 5;
+const MIN_COUNT = 0;
 const DIRECTORS_MIN = 0;
 const DIRECTORS_MAX = 6;
 const WRITES_MIN = 0;
@@ -201,14 +203,22 @@ const generateCommentDate = () => {
   return dayjs(commentDate).fromNow();
 };
 
-const getCommentText = () => (
+const getCommentText = (id) => (
   {
-    id: nanoid(),
+    id: id,
     author: authors[getRandomValue(ELEMENT_MIN_VALUE , ELEMENT_MAX_VALUE)],
     comment: filmComments[getRandomValue(ELEMENT_MIN_VALUE , ELEMENT_MAX_VALUE)],
     dateComment: generateCommentDate(),
     emotion: emotions[getRandomValue(ELEMENT_MIN_VALUE , EMOTION_MAX)]}
 );
+
+const getCommentsIdArray = () => {
+  const idCount = getRandomValue(MIN_COUNT, MAX_COUNT );
+
+  return new Array(idCount)
+    .fill()
+    .map(() => nanoid());
+};
 
 const getCreateFilmCard = () => {
 
@@ -216,11 +226,9 @@ const getCreateFilmCard = () => {
   const textDescription = createDescriptionPopup();
   const date = dayjs(getRandomDate());
   const title = filmsNames[index];
-  const commentsCount = getRandomValue(COMMENTS_LANGTH_MIN, COMMENTS_LANGTH_MAX);
-  const commentsText = new Array(commentsCount).fill().map(getCommentText);
-
 
   return {
+    commentsId: getCommentsIdArray(),
     id: nanoid(),
     title: title,
     alternativeTitle: title,
@@ -239,8 +247,8 @@ const getCreateFilmCard = () => {
     runtime: getRandomValue(TIME_MINUTE_MIN, TIME_MINUTE_MAX),
     genre: generateGenre(),
     description:  textDescription,
-    comments: commentsText.length,
-    commentsText: commentsText,
+    //comments: commentsText.length,
+    //commentsText: commentsText,
     isWatchlist: Boolean(getRandomValue(BOOLEAN_MIN, BOOLEAN_MAX)),
     isWatched: Boolean(getRandomValue(BOOLEAN_MIN, BOOLEAN_MAX)),
     //watchingDate: getRandomArbitrary(DATE_MAX_WATCH, DATE_MIN_WATCH),

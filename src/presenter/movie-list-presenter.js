@@ -59,6 +59,12 @@ export default class MovieListPresenter {
     return filteredFilms;
   }
 
+  /*get comments() {
+    // eslint-disable-next-line no-console
+    console.log(this.#commentsModel.getcomments());
+    return this.#commentsModel.comments;
+  }*/
+
   init = () => {
     render(this.#boardContainer, this.#boardComponent, RenderPosition.BEFOREEND);
     render(this.#boardComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
@@ -67,33 +73,33 @@ export default class MovieListPresenter {
     this.#renderBoard();
   }
 
-  #handleViewAction = (actionType, updateType, update, id, newComment) => {
+  #handleViewAction = (actionType, updateType, update, id, newComment, scroll) => {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this.#filmsModel.updateFilm(updateType, update);
+        this.#filmsModel.updateFilm(updateType, update, id);
+        break;
+      case UserAction.UPDATE_FILM_WITH_COMMENTS:
+        this.#commentsModel.updateComments(updateType, update, id);
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(updateType, update, newComment);
+        this.#commentsModel.addComment(updateType, update, id, newComment);
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update, id);
+        this.#commentsModel.deleteComment(updateType, update, id, newComment, scroll);
         break;
     }
   }
 
-  #handleModelEvent = (updateType, data) => {
+  #handleModelEvent = (updateType, data, comments, scroll) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
-        this.#filmPresenter.get(data.id).init(data);
+        this.#filmPresenter.get(data.id).init(data, comments, scroll);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
         this.#clearBoard();
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
         this.#clearBoard({ resetRenderedCardCount: true, resetSortType: true });
         this.#renderBoard();
         break;
@@ -124,7 +130,7 @@ export default class MovieListPresenter {
 
   #renderFilm = (place, card) => {
     const moviePresenter = new MoviePresenter(place, this.#handleViewAction, this.#handleModeChange);
-    moviePresenter.init(card);
+    moviePresenter.init(card, this.#commentsModel.getcomments(card.id));
     this.#filmPresenter.set(card.id, moviePresenter);
   }
 
@@ -141,7 +147,7 @@ export default class MovieListPresenter {
   }
 
   #renderFilms = (films) => {
-    films.forEach((film) => this.#renderFilm(this.#filmsContainerComponent, film));
+    films.forEach((film) => this.#renderFilm(this.#filmsContainerComponent, film, this.#commentsModel.getcomments(film.id)));
   }
 
   #renderFilmsTopRated = (place, cards) => {
@@ -181,7 +187,7 @@ export default class MovieListPresenter {
   }
 
   #renderExtraFilms = () => {
-    if (this.this.films.length > 1) {
+    if (this.films.length > 1) {
       render(this.#boardComponent, this.#filmsListTopRatedExtraView, RenderPosition.BEFOREEND);
       const filmsContainerTopRated = document.querySelector('#top-rated');
       const topRated = filmsContainerTopRated.querySelector('div');
@@ -212,9 +218,6 @@ export default class MovieListPresenter {
     if (resetRenderedCardCount) {
       this.#renderedFilmCount = CARD_COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества задач (например, удаление или перенос в архив)
-      // нужно скорректировать число показанных задач
       this.#renderedFilmCount = Math.min(filmCount, this.#renderedFilmCount);
     }
 
