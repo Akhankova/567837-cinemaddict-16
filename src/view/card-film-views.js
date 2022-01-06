@@ -11,7 +11,6 @@ const createCardFilmTemplate = (card, comments) => {
   const date = dayjs(filmDate).format('YYYY');
   const filmRuntime = getTime(runtime);
   const descriptionCard = createMessageCard(description);
-  //${commentsText.length}
   const washListClassName = isWatchlist
     ? 'film-card__controls-item film-card__controls-item--add-to-watchlist film-card__controls-item--active'
     : 'film-card__controls-item film-card__controls-item--add-to-watchlist';

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import AbstractObservable from '../utils.js';
 
 export default class CommentsModel extends AbstractObservable {
@@ -30,7 +29,7 @@ export default class CommentsModel extends AbstractObservable {
     this._notify(updateType, update, this.#filmComments);
   }
 
-  deleteComment(updateType, update, id, comments, scroll) {
+  deleteComment(updateType, update, id, comments) {
     this.#filmComments = comments;
     const index = this.#filmComments.findIndex((comment) => comment.id === id);
 
@@ -42,7 +41,8 @@ export default class CommentsModel extends AbstractObservable {
       ...this.#filmComments.slice(0, index),
       ...this.#filmComments.slice(index + 1),
     ];
-    this._notify(updateType, update, this.#filmComments, scroll);
+
+    this._notify(updateType, update, this.#filmComments);
   }
 
 }

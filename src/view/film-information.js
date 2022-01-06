@@ -6,7 +6,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import { getTime } from '../utils.js';
 import SmartView from './smart-view.js';
-import {nanoid} from 'nanoid';
+import { nanoid } from 'nanoid';
 
 const creatCommentCountTemplate = (comments) => comments > 0 ? `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>` : ' ';
 const createFilmPopupCommentsTemplate = (commentLi) => {
@@ -34,9 +34,9 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
 };
 const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment)).join(' ');
 
-const createFilmInformationTemplate = (data, comments) => {
-  const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites, commentText, commentEmotion } = data;
-  //commentsText
+const createFilmInformationTemplate = (data, comments, emotionNew, commentTextNew) => {
+
+  const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites } = data;
   const filmRuntime = getTime(runtime);
   const date = filmDate.format('DD MMMM YYYY');
 
@@ -126,11 +126,11 @@ const createFilmInformationTemplate = (data, comments) => {
         </ul>
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-          ${(commentEmotion !== undefined && commentEmotion !== ' ') ? `<img src="/images/emoji/${commentEmotion}.png"
-          alt="emoji" width="55" height="55" value="${commentEmotion !== undefined ? commentEmotion : ' '}">` : ' '}
+          ${(emotionNew !== undefined && emotionNew !== ' ') ? `<img src="/images/emoji/${emotionNew}.png"
+          alt="emoji" width="55" height="55" value="${emotionNew !== undefined ? emotionNew : ' '}">` : ' '}
           </div>
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText !== undefined ? he.encode(commentText) : ''}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentTextNew !== undefined ? he.encode(commentTextNew) : ''}</textarea>
           </label>
           <div class="film-details__emoji-list">
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
@@ -159,20 +159,29 @@ const createFilmInformationTemplate = (data, comments) => {
 
 export default class FilmInfotmationView extends SmartView {
   #comments = null;
-  constructor(film, comments) {
+  #emotionNew = null;
+  #commentTextNew = null;
+  #scrollDoc = null;
+
+  constructor(film, comments, emotionNew, commentTextNew, scrollDoc) {
     super();
     this._data = FilmInfotmationView.parseFilmToData(film);
     this.#comments = FilmInfotmationView.parseCommentsToData(comments);
+    this.#emotionNew = emotionNew;
+    this.#commentTextNew = commentTextNew;
+    this.#scrollDoc = scrollDoc;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createFilmInformationTemplate(this._data, this.#comments);
+    return createFilmInformationTemplate(this._data, this.#comments, this.#emotionNew, this.#commentTextNew, this.#scrollDoc);
   }
 
   reset = (film, comments) => {
-    this._data = FilmInfotmationView.parseFilmToData({ ...film});
+    this._data = FilmInfotmationView.parseFilmToData({ ...film });
     this.#comments = FilmInfotmationView.parseCommentsToData(comments);
+    this.#emotionNew = ' ';
+    this.#commentTextNew = '';
     this.updateData(this._data);
     this.updateData(this.#comments);
   }
@@ -184,7 +193,8 @@ export default class FilmInfotmationView extends SmartView {
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setDeleteClickHandler(this._callback.deleteClick);
     this.setAddClickHandler(this._callback.addClick);
-    this.setCommentsHandler(this._callback.getComments);
+    this.setCommentsEmotionHandler(this._callback.getComments);
+    this.setCommentNewTextHandler(this._callback.getCommentTextNew);
 
     this.#setInnerHandlers();
   }
@@ -199,12 +209,18 @@ export default class FilmInfotmationView extends SmartView {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#editClickHandler);
   }
 
-  setCommentsHandler = (callback) => {
+  setCommentsEmotionHandler = (callback) => {
     this._callback.getComments = callback;
+  }
+
+  setCommentNewTextHandler = (callback) => {
+    this._callback.getCommentTextNew = callback;
   }
 
   #editClickHandler = (evt) => {
     evt.preventDefault();
+    this.#emotionNew = ' ';
+    this.#commentTextNew = '';
     this._callback.editClick();
   }
 
@@ -246,7 +262,7 @@ export default class FilmInfotmationView extends SmartView {
     });
   }
 
-  createNewComment () {
+  createNewComment() {
     return {
       id: nanoid(),
       author: 'Alex Ivanov',
@@ -258,11 +274,13 @@ export default class FilmInfotmationView extends SmartView {
 
   #formAddClickHandler = (evt) => {
     if (evt.keyCode === 13 && (evt.metaKey || evt.ctrlKey) && (evt.keyCode === 13 || evt.keyCode === 10) && (evt.metaKey || evt.ctrlKey)) {
-      if (this._data.commentEmotion !== ' ' && this._data.commentText !== '') {
+      if (this.#emotionNew !== ' ' && this.#commentTextNew !== '') {
+        this.#scrollDoc = this.element.scrollHeight;
         const newComment = this.createNewComment();
-        this._data.commentEmotion = ' ';
-        this._data.commentText = '';
-        this._callback.addClick(FilmInfotmationView.parseFilmToData(this._data), newComment, FilmInfotmationView.parseCommentsToData(this.#comments));
+        this.#emotionNew = ' ';
+        this.#commentTextNew = '';
+        this._callback.addClick(FilmInfotmationView.parseFilmToData(this._data), newComment, FilmInfotmationView.parseCommentsToData(this.#comments), this.#emotionNew, this.#commentTextNew, this.element.scrollHeight);
+        document.querySelector('.film-details').scrollTop = this.#scrollDoc;
       }
     }
   }
@@ -272,34 +290,45 @@ export default class FilmInfotmationView extends SmartView {
     if (evt.target.tagName !== 'BUTTON') {
       return;
     }
-    const scroll = this.element.scrollTop;
-    this._callback.deleteClick(FilmInfotmationView.parseFilmToData(this._data), evt.currentTarget.id, FilmInfotmationView.parseCommentsToData(this.#comments), scroll);
+    this.#scrollDoc = this.element.scrollTop;
+    this._callback.deleteClick(FilmInfotmationView.parseFilmToData(this._data), evt.currentTarget.id, FilmInfotmationView.parseCommentsToData(this.#comments), this.element.scrollTop);
+    document.querySelector('.film-details').scrollTop = this.#scrollDoc;
   }
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.favoriteClick(this.#comments);
+    this.#scrollDoc = this.element.scrollTop;
+    this._callback.favoriteClick(this.#comments, this.element.scrollTop);
+    document.querySelector('.film-details').scrollTop = this.#scrollDoc;
   }
 
   #watchedClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchedClick(this.#comments);
+    this.#scrollDoc = this.element.scrollTop;
+    this._callback.watchedClick(this.#comments, this.element.scrollTop);
+    document.querySelector('.film-details').scrollTop = this.#scrollDoc;
   }
 
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchlistClick(this.#comments);
+    this.#scrollDoc = this.element.scrollTop;
+    this._callback.watchlistClick(this.#comments, this.element.scrollTop);
+    document.querySelector('.film-details').scrollTop = this.#scrollDoc;
   }
 
   #emotionClickHandler = (evt) => {
     evt.preventDefault();
+    this.#emotionNew = evt.target.value;
+    this._callback.getComments(evt.target.value);
     this.updateData({
-      commentEmotion: evt.target.value,
+      commentEmotion: this.#emotionNew,
     });
   }
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
+    this.#commentTextNew = evt.target.value;
+    this._callback.getCommentTextNew(evt.target.value);
     this.updateData({
       commentText: evt.target.value,
     }, true);

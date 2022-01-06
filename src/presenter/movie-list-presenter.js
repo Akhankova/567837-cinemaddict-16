@@ -9,7 +9,7 @@ import FilmsListTopRatedExtraView from '../view/films-list-extra-views-top-rated
 import FilmsListExtraMostCommentedView from '../view/films-list-extra-most-commented';
 import MoviePresenter from './movie-presenter';
 import { RenderPosition, render, remove, getSortRateCard, getSortDateCard } from '../render';
-import {filter} from '../utils.js';
+import { filter } from '../utils.js';
 
 
 export default class MovieListPresenter {
@@ -59,12 +59,6 @@ export default class MovieListPresenter {
     return filteredFilms;
   }
 
-  /*get comments() {
-    // eslint-disable-next-line no-console
-    console.log(this.#commentsModel.getcomments());
-    return this.#commentsModel.comments;
-  }*/
-
   init = () => {
     render(this.#boardContainer, this.#boardComponent, RenderPosition.BEFOREEND);
     render(this.#boardComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
@@ -73,7 +67,7 @@ export default class MovieListPresenter {
     this.#renderBoard();
   }
 
-  #handleViewAction = (actionType, updateType, update, id, newComment, scroll) => {
+  #handleViewAction = (actionType, updateType, update, id, newComment) => {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update, id);
@@ -85,15 +79,15 @@ export default class MovieListPresenter {
         this.#commentsModel.addComment(updateType, update, id, newComment);
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update, id, newComment, scroll);
+        this.#commentsModel.deleteComment(updateType, update, id, newComment);
         break;
     }
   }
 
-  #handleModelEvent = (updateType, data, comments, scroll) => {
+  #handleModelEvent = (updateType, data, comments) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#filmPresenter.get(data.id).init(data, comments, scroll);
+        this.#filmPresenter.get(data.id).init(data, comments);
         break;
       case UpdateType.MINOR:
         this.#clearBoard();

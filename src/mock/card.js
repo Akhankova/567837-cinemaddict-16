@@ -5,8 +5,6 @@ dayjs.extend(duration);
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
-//const COMMENTS_LANGTH_MAX = 5;
-//const COMMENTS_LANGTH_MIN = 0;
 const DESCRIPTION_MIN = 1;
 const DESCRIPTION_MAX = 5;
 const RATING_MIN = 1;
@@ -31,7 +29,7 @@ const ELEMENT_MAX_VALUE = 6;
 const EMOTION_MAX = 3;
 const ACTOR_MIN_COUNT = 2;
 const ACTOR_MAX_COUNT= 6;
-const MAX_COUNT= 5;
+const MAX_COUNT= 10;
 const MIN_COUNT = 0;
 const DIRECTORS_MIN = 0;
 const DIRECTORS_MAX = 6;
@@ -247,8 +245,6 @@ const getCreateFilmCard = () => {
     runtime: getRandomValue(TIME_MINUTE_MIN, TIME_MINUTE_MAX),
     genre: generateGenre(),
     description:  textDescription,
-    //comments: commentsText.length,
-    //commentsText: commentsText,
     isWatchlist: Boolean(getRandomValue(BOOLEAN_MIN, BOOLEAN_MAX)),
     isWatched: Boolean(getRandomValue(BOOLEAN_MIN, BOOLEAN_MAX)),
     //watchingDate: getRandomArbitrary(DATE_MAX_WATCH, DATE_MIN_WATCH),

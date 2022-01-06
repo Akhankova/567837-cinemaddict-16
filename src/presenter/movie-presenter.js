@@ -20,7 +20,10 @@ export default class MoviePresenter {
 
   #film = null;
   #comments = null;
-  #mode = Mode.DEFAULT
+  #emotion = ' ';
+  #newCommentText = '';
+  #mode = Mode.DEFAULT;
+  #scroll = null;
 
   constructor(filmListContainer, changeData, changeMode) {
     this.#filmListContainer = filmListContainer;
@@ -31,13 +34,10 @@ export default class MoviePresenter {
   init = (film, comments) => {
     this.#film = film;
     this.#comments = comments;
-
     const prevFilmComponent = this.#filmComponent;
     const prevFilmEditComponent = this.#filmEditComponent;
-
     this.#filmComponent = new CardFilmView(film, comments);
-    this.#filmEditComponent = new FilmInfotmationView(film, comments);
-    //this.#filmEditComponent = new FilmInfotmationView(film, comments, this.#scroll);
+    this.#filmEditComponent = new FilmInfotmationView(film, comments, this.#emotion, this.#newCommentText, this.#scroll);
     this.#filmComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#filmComponent.setHistoryClickHandler(this.#handleHistoryClick);
     this.#filmComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
@@ -50,7 +50,8 @@ export default class MoviePresenter {
     this.#filmEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#filmEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
     this.#filmEditComponent.setAddClickHandler(this.#handleAddClick);
-    this.#filmEditComponent.setCommentsHandler(this.#handleComments);
+    this.#filmEditComponent.setCommentsEmotionHandler(this.#handleGetCommentsEmotion);
+    this.#filmEditComponent.setCommentNewTextHandler(this.#handleGetCommentText);
 
     if (prevFilmComponent === null || prevFilmEditComponent === null) {
       render(this.#filmListContainer, this.#filmComponent, RenderPosition.BEFOREEND);
@@ -85,8 +86,9 @@ export default class MoviePresenter {
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      bodyElement.classList.remove('hide-overflow');
-      this.#onReplaceFormCardInfoClick();
+      this.#mode = Mode.DEFAULT;
+      this.#filmEditComponent.reset(this.#film, this.#comments);
+      this.#filmEditComponent.element.remove();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     }
   };
@@ -118,10 +120,13 @@ export default class MoviePresenter {
   }
 
   #handleEditClick = () => {
+    this.#emotion = ' ';
+    this.#newCommentText = '';
     this.#onReplaceFormCardInfoClick();
   }
 
-  #handleFavoriteClick = (comments) => {
+  #handleFavoriteClick = (comments, scroll) => {
+    this.#scroll = scroll;
     this.#comments = comments;
     this.#changeData(
       bodyElement.querySelector('.film-details') ? UserAction.UPDATE_FILM_WITH_COMMENTS : UserAction.UPDATE_FILM,
@@ -129,7 +134,8 @@ export default class MoviePresenter {
       { ...this.#film, isFavorites: !this.#film.isFavorites }, this.#comments);
   }
 
-  #handleHistoryClick = (comments) => {
+  #handleHistoryClick = (comments, scroll) => {
+    this.#scroll = scroll;
     this.#comments = comments;
     this.#changeData(
       bodyElement.querySelector('.film-details') ? UserAction.UPDATE_FILM_WITH_COMMENTS : UserAction.UPDATE_FILM,
@@ -137,7 +143,8 @@ export default class MoviePresenter {
       { ...this.#film, isWatched: !this.#film.isWatched }, this.#comments);
   }
 
-  #handleWatchlistClick = (comments) => {
+  #handleWatchlistClick = (comments, scroll) => {
+    this.#scroll = scroll;
     this.#comments = comments;
     this.#changeData(
       bodyElement.querySelector('.film-details') ? UserAction.UPDATE_FILM_WITH_COMMENTS : UserAction.UPDATE_FILM,
@@ -145,7 +152,8 @@ export default class MoviePresenter {
       { ...this.#film, isWatchlist: !this.#film.isWatchlist }, this.#comments);
   }
 
-  #handleDeleteClick = (film, id, comments) => {
+  #handleDeleteClick = (film, id, comments, scroll) => {
+    this.#scroll = scroll;
     this.#changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
@@ -153,10 +161,12 @@ export default class MoviePresenter {
       id,
       comments,
     );
-    //this.#scroll = scroll;
   }
 
-  #handleAddClick = (film, comment, comments) => {
+  #handleAddClick = (film, comment, comments, emotionNew, commentTextNew, scroll) => {
+    this.#scroll = scroll;
+    this.#emotion = emotionNew;
+    this.#newCommentText = commentTextNew;
     this.#changeData(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
@@ -166,7 +176,11 @@ export default class MoviePresenter {
     );
   }
 
-  #handleComments = (comments) => {
-    this.#comments = comments;
+  #handleGetCommentsEmotion = (emotion) => {
+    this.#emotion = emotion;
   };
+
+  #handleGetCommentText = (text) => {
+    this.#newCommentText = text;
+  }
 }

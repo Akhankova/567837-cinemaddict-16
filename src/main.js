@@ -1,6 +1,5 @@
 import ProfileView from './view/profile-view.js';
 import { RenderPosition, render } from './render.js';
-//import NavigationView from './view/navigation-view';
 import FooterView from './view/footer-views';
 import { getCreateFilmCard, getCommentText } from './mock/card.js';
 import { CARD_COUNT } from './consts.js';
@@ -9,22 +8,19 @@ import FilmsModel from './model/films-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import CommentsModel from './model/comments-model.js';
-//import getRandomValue from './utils.js';
-//const COMMENTS_LANGTH_MAX = 5;
-//const COMMENTS_LANGTH_MIN = 0;
 
 const films = Array.from({ length: CARD_COUNT }, getCreateFilmCard);
 const filmsModel = new FilmsModel();
 filmsModel.films = films;
 
-const comments = films.reduce((a, film) => {
+const comments = films.reduce((filmComments, film) => {
   const comment = {
     id: film.id,
     comments: film.commentsId.map((id) => getCommentText(id)),
   };
 
-  a.push(comment);
-  return a;
+  filmComments.push(comment);
+  return filmComments;
 }, []);
 
 const commentsModel = new CommentsModel();
