@@ -1,22 +1,42 @@
 import ProfileView from './view/profile-view.js';
 import { RenderPosition, render } from './render.js';
-import NavigationView from './view/navigation-view';
 import FooterView from './view/footer-views';
-import { getCreateFilmCard, generateFilter } from './mock/card.js';
-import { CARD_COUNT } from './consts';
-import MovieListPresenter from './presenter/movie-list-presenter';
+import { getCreateFilmCard, getCommentText } from './mock/card.js';
+import { CARD_COUNT } from './consts.js';
+import MovieListPresenter from './presenter/movie-list-presenter.js';
+import FilmsModel from './model/films-model.js';
+import FilterModel from './model/filter-model.js';
+import FilterPresenter from './presenter/filter-presenter.js';
+import CommentsModel from './model/comments-model.js';
 
 const films = Array.from({ length: CARD_COUNT }, getCreateFilmCard);
-const filters = generateFilter(films);
+const filmsModel = new FilmsModel();
+filmsModel.films = films;
+
+const comments = films.reduce((filmComments, film) => {
+  const comment = {
+    id: film.id,
+    comments: film.commentsId.map((id) => getCommentText(id)),
+  };
+
+  filmComments.push(comment);
+  return filmComments;
+}, []);
+
+const commentsModel = new CommentsModel();
+commentsModel.setcomments(comments);
+
+const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const footer = document.querySelector('.footer');
 
-const boardPresenter = new MovieListPresenter(siteMainElement);
-
 render(siteHeaderElement, new ProfileView(films), RenderPosition.BEFOREEND);
-render(siteMainElement, new NavigationView(filters), RenderPosition.BEFOREEND);
 render(footer, new FooterView(films), RenderPosition.BEFOREEND);
 
-boardPresenter.init(films);
+const boardPresenter = new MovieListPresenter(siteMainElement, filmsModel, filterModel, commentsModel);
+const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
+
+filterPresenter.init();
+boardPresenter.init();
