@@ -9,11 +9,14 @@ export default class FilterPresenter {
   #filmsModel = null;
 
   #filterComponent = null;
+  #statisticsHandler = null;
 
-  constructor(filterContainer, filterModel, filmsModel) {
+  constructor(filterContainer, filterModel, filmsModel, statisticsHandler) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#filmsModel = filmsModel;
+    this.#statisticsHandler = statisticsHandler;
+
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -28,12 +31,12 @@ export default class FilterPresenter {
         count: filter[FilterType.ALL](films).length,
       },
       {
-        type: FilterType.OVERDUE,
+        type: FilterType.WATHLIST,
         name: 'Wathlist',
         count: filter[FilterType.WATHLIST](films).length,
       },
       {
-        type: FilterType.TODAY,
+        type: FilterType.HISTORY,
         name: 'History',
         count: filter[FilterType.HISTORY](films).length,
       },
@@ -66,10 +69,17 @@ export default class FilterPresenter {
   }
 
   #handleFilterTypeChange = (filterType) => {
+    if (filterType === FilterType.STATISTICS) {
+      this.#filterModel.setFilter(null, filterType);
+      this.#statisticsHandler(filterType);
+      return;
+    }
+
     if (this.#filterModel.filter === filterType) {
       return;
     }
 
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.#statisticsHandler(filterType);
   }
 }

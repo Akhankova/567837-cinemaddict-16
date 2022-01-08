@@ -41,14 +41,15 @@ export default class MovieListPresenter {
     this.#filterModel = filterModel;
     this.#commentsModel = commentsModel;
 
-    this.#filmsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
-    this.#commentsModel.addObserver(this.#handleModelEvent);
+    //this.#filmsModel.addObserver(this.#handleModelEvent);
+    //this.#filterModel.addObserver(this.#handleModelEvent);
+    //this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
-    this.#filterType = this.#filterModel.filter;
     const films = this.#filmsModel.films;
+    if (this.#filterModel.filter === 'stats') {return filter[FilterType.ALL](films);}
+    this.#filterType = this.#filterModel.filter;
     const filteredFilms = filter[this.#filterType](films);
     switch (this.#currentSortType) {
       case SortType.RATING_SORT:
@@ -64,7 +65,22 @@ export default class MovieListPresenter {
     render(this.#boardComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
     render(this.#filmsListComponent, this.#filmsContainerComponent, RenderPosition.BEFOREEND);
 
+    this.#filmsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#commentsModel.addObserver(this.#handleModelEvent);
+
     this.#renderBoard();
+  }
+
+  destroy = () => {
+    this.#clearBoard({resetRenderedTaskCount: true, resetSortType: true});
+
+    remove(this.#filmsListComponent);
+    remove(this.#boardComponent);
+
+    this.#filmsModel.removeObserver(this.#handleModelEvent);
+    this.#filterModel.removeObserver(this.#handleModelEvent);
+    this.#commentsModel.removeObserver(this.#handleModelEvent);
   }
 
   #handleViewAction = (actionType, updateType, update, id, newComment) => {

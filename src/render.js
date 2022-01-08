@@ -31,6 +31,21 @@ export const render = (container, element, place) => {
   }
 };
 
+export const getRating = (wachedMovies) => {
+  if(wachedMovies === 0){
+    return '';
+  }
+  if(wachedMovies <= 10){
+    return 'Novice';
+  }
+  if(wachedMovies <= 20){
+    return 'Fan';
+  }
+  if(wachedMovies >= 21){
+    return 'Movie Buff';
+  }
+};
+
 export const getSortRateCard = (cardA, cardB) => cardB.totalRating - cardA.totalRating;
 export const getSortDateCard = (a, b) => new Date(b.filmDate) - new Date(a.filmDate);
 
