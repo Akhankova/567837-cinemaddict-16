@@ -28,5 +28,12 @@ export const FilterType = {
   WATHLIST: 'Wathlist',
   HISTORY: 'History',
   FAVORITES: 'Favorites',
+  STATISTICS: 'Statistics',
 };
+
+export const MenuItem = {
+  FILTERS: 'FILTERS',
+  STATISTICS: 'STATISTICS',
+};
+
 

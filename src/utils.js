@@ -52,5 +52,6 @@ export const filter = {
   [FilterType.WATHLIST]: (cards) => cards.filter((card) => card.isWatchlist),
   [FilterType.HISTORY]: (cards) => cards.filter((card) => card.isWatched),
   [FilterType.FAVORITES]: (cards) => cards.filter((card) => card.isFavorites),
+  [FilterType.STATISTICS]: (cards) => cards.filter((card) => card),
 };
 

@@ -247,7 +247,6 @@ const getCreateFilmCard = () => {
     description:  textDescription,
     isWatchlist: Boolean(getRandomValue(BOOLEAN_MIN, BOOLEAN_MAX)),
     isWatched: Boolean(getRandomValue(BOOLEAN_MIN, BOOLEAN_MAX)),
-    //watchingDate: getRandomArbitrary(DATE_MAX_WATCH, DATE_MIN_WATCH),
     watchingDate: dayjs(getRandomDate()).format('DD MMMM YYYY'),
     isFavorites: Boolean(getRandomValue(BOOLEAN_MIN, BOOLEAN_MAX)),
     smile: '',

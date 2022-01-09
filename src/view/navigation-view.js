@@ -1,10 +1,11 @@
 import AbstractView from './abstract-view.js';
+import {MenuItem} from '../consts.js';
 
 const createFilterItemTemplate = (filter, currentFilterType) => {
   const { name, count } = filter;
   return (
     `
-    <a href="#${name}" name='${name}' class="main-navigation__item ${name === currentFilterType ? 'main-navigation__item--active' : ''}">${name !== 'All' ? name : `${name} movies`} ${name === 'All' ? ' ' : `<span class="main-navigation__item-count">${count}</span>`}</a>
+    <a href="#${name}"  value="${MenuItem.FILTERS}" name='${name}' class="main-navigation__item ${name === currentFilterType ? 'main-navigation__item--active' : ''}">${name !== 'All' ? name : `${name} movies`} ${name === 'All' ? ' ' : `<span class="main-navigation__item-count">${count}</span>`}</a>
     `
   );
 };
@@ -19,7 +20,7 @@ const createMainNavigation = (filterItems, currentFilterType) => {
     <div class="main-navigation__items">
     ${filterItemsTemplate}
       </div>
-    <a href="#stats" class="main-navigation__additional">Stats</a>
+    <a href="#stats" name='stats' value="${MenuItem.STATISTICS}" class="main-navigation__additional ${currentFilterType === 'stats' ? 'main-navigation__item--active' : ''}">Stats</a>
   </nav>`
   );
 };
@@ -50,5 +51,25 @@ export default class NavigationView extends AbstractView {
     }
     this._callback.filterTypeChange(evt.target.name);
   }
+
+  /*setMenuClickHandler = (callback) => {
+    this._callback.menuClick = callback;
+    this.element.addEventListener('click', this.#menuClickHandler);
+  }
+
+  setMenuItem = (menuItem) => {
+    const item = this.element.querySelector(`[value=${menuItem}]`);
+
+    if (item !== null) {
+      item.checked = true;
+    }
+  }
+
+  #menuClickHandler = (evt) => {
+    evt.preventDefault();
+    // eslint-disable-next-line no-console
+    console.log(evt.target.value);
+    this._callback.menuClick(evt.target.value);
+  }*/
 
 }
