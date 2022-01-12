@@ -1,30 +1,32 @@
 import ProfileView from './view/profile-view.js';
 import { RenderPosition, render, remove } from './render.js';
 import FooterView from './view/footer-views';
-import { getCreateFilmCard, getCommentText } from './mock/card.js';
-import { CARD_COUNT } from './consts.js';
+import { getCommentText } from './mock/card.js';
 import MovieListPresenter from './presenter/movie-list-presenter.js';
 import FilmsModel from './model/films-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import CommentsModel from './model/comments-model.js';
 import StatisticsView from './view/statistics-view.js';
+import ApiService from './api-service.js';
 
-const films = Array.from({ length: CARD_COUNT }, getCreateFilmCard);
-const filmsModel = new FilmsModel();
-filmsModel.films = films;
+const AUTHORIZATION = 'Basic hS2ssS66wcm1sa9j';
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 
-const comments = films.reduce((filmComments, film) => {
+const filmsModel = new FilmsModel(new ApiService(END_POINT, AUTHORIZATION));
+// eslint-disable-next-line no-console
+console.log(filmsModel.films);
+
+const comments = filmsModel.films.reduce((filmComments, film) => {
   const comment = {
     id: film.id,
     comments: film.commentsId.map((id) => getCommentText(id)),
   };
-
   filmComments.push(comment);
   return filmComments;
 }, []);
 
-const commentsModel = new CommentsModel();
+const commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
 commentsModel.setcomments(comments);
 
 const filterModel = new FilterModel();
@@ -32,9 +34,6 @@ const filterModel = new FilterModel();
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const footer = document.querySelector('.footer');
-
-render(siteHeaderElement, new ProfileView(films), RenderPosition.BEFOREEND);
-render(footer, new FooterView(films), RenderPosition.BEFOREEND);
 
 const boardPresenter = new MovieListPresenter(siteMainElement, filmsModel, filterModel, commentsModel);
 
@@ -57,3 +56,8 @@ const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsM
 
 filterPresenter.init();
 boardPresenter.init();
+
+filmsModel.init().finally(() => {
+  render(siteHeaderElement, new ProfileView(filmsModel.films), RenderPosition.BEFOREEND);
+  render(footer, new FooterView(filmsModel.films), RenderPosition.BEFOREEND);
+});

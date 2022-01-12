@@ -10,6 +10,7 @@ import FilmsListExtraMostCommentedView from '../view/films-list-extra-most-comme
 import MoviePresenter from './movie-presenter';
 import { RenderPosition, render, remove, getSortRateCard, getSortDateCard } from '../render';
 import { filter } from '../utils.js';
+import LoadingView from '../view/loading-view.js';
 
 
 export default class MovieListPresenter {
@@ -19,6 +20,7 @@ export default class MovieListPresenter {
   #filterModel = null;
   #noCardComponent = null;
 
+  #loadingComponent = new LoadingView();
   #boardComponent = new BoardFilmsView();
   #filmsContainerComponent = new FilmsContainerView();
   #filmsListComponent = new FilmsListView();
@@ -34,6 +36,7 @@ export default class MovieListPresenter {
   #filmCardTopRatedPresenters = new Map();
   #filmCardMostCommentedPresenters = new Map();
   #filterType = FilterType.ALL;
+  #isLoading = true;
 
   constructor(boardContainer, filmsModel, filterModel, commentsModel) {
     this.#boardContainer = boardContainer;
@@ -48,7 +51,9 @@ export default class MovieListPresenter {
 
   get films() {
     const films = this.#filmsModel.films;
-    if (this.#filterModel.filter === 'stats') {return filter[FilterType.ALL](films);}
+    // eslint-disable-next-line no-console
+    console.log(this.#filmsModel.films);
+    if (this.#filterModel.filter === 'stats') { return filter[FilterType.ALL](films); }
     this.#filterType = this.#filterModel.filter;
     const filteredFilms = filter[this.#filterType](films);
     switch (this.#currentSortType) {
@@ -73,7 +78,7 @@ export default class MovieListPresenter {
   }
 
   destroy = () => {
-    this.#clearBoard({resetRenderedTaskCount: true, resetSortType: true});
+    this.#clearBoard({ resetRenderedTaskCount: true, resetSortType: true });
 
     remove(this.#filmsListComponent);
     remove(this.#boardComponent);
@@ -111,6 +116,14 @@ export default class MovieListPresenter {
         break;
       case UpdateType.MAJOR:
         this.#clearBoard({ resetRenderedCardCount: true, resetSortType: true });
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        //remove(this.#sortComponent);
+        //remove(this.#loadMoreButtonComponent);
+        this.#clearBoard();
         this.#renderBoard();
         break;
     }
@@ -189,6 +202,10 @@ export default class MovieListPresenter {
     }
   }
 
+  #renderLoading = () => {
+    render(this.#boardComponent, this.#loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
   #renderLoadMoreButton = () => {
     this.#loadMoreButtonComponent = new ButtonShowMoreView();
 
@@ -218,6 +235,7 @@ export default class MovieListPresenter {
     this.#filmPresenter.forEach((presenter) => presenter.destroy());
     this.#filmPresenter.clear();
 
+    remove(this.#loadingComponent);
     remove(this.#sortComponent);
     remove(this.#loadMoreButtonComponent);
 
@@ -237,6 +255,10 @@ export default class MovieListPresenter {
   }
 
   #renderBoard = () => {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
     const films = this.films;
     const filmCount = films.length;
 

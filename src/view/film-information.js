@@ -38,7 +38,7 @@ const createFilmInformationTemplate = (data, comments, emotionNew, commentTextNe
 
   const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites } = data;
   const filmRuntime = getTime(runtime);
-  const date = filmDate.format('DD MMMM YYYY');
+  const date = dayjs(filmDate).format('DD MMMM YYYY');
 
   const washListClassName = isWatchlist
     ? 'film-details__control-button film-details__control-button--watchlist film-details__control-button--active'
