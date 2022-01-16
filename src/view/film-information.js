@@ -20,7 +20,7 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
   return (
     `<li class="film-details__comment" id="${id}">
     <span class="film-details__comment-emoji">
-      <img src="${emotion}" width="55" height="55" alt="emoji-smile">
+      <img src="/images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
     </span>
     <div>
       <p class="film-details__comment-text">${comment}</p>
@@ -35,7 +35,6 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
 const createFilmPopupAllCommentsTemplate = (commentsText) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment)).join(' ');
 
 const createFilmInformationTemplate = (data, comments, emotionNew, commentTextNew) => {
-
   const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites } = data;
   const filmRuntime = getTime(runtime);
   const date = dayjs(filmDate).format('DD MMMM YYYY');

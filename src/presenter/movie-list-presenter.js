@@ -43,16 +43,10 @@ export default class MovieListPresenter {
     this.#filmsModel = filmsModel;
     this.#filterModel = filterModel;
     this.#commentsModel = commentsModel;
-
-    //this.#filmsModel.addObserver(this.#handleModelEvent);
-    //this.#filterModel.addObserver(this.#handleModelEvent);
-    //this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
     const films = this.#filmsModel.films;
-    // eslint-disable-next-line no-console
-    console.log(this.#filmsModel.films);
     if (this.#filterModel.filter === 'stats') { return filter[FilterType.ALL](films); }
     this.#filterType = this.#filterModel.filter;
     const filteredFilms = filter[this.#filterType](films);
@@ -88,7 +82,15 @@ export default class MovieListPresenter {
     this.#commentsModel.removeObserver(this.#handleModelEvent);
   }
 
+  getComments = async (card) => {
+    const commentsPromise = await this.#commentsModel.getСommentItems(card.id);
+    const carsComments = [...commentsPromise];
+    return carsComments;
+  };
+
   #handleViewAction = (actionType, updateType, update, id, newComment) => {
+    // eslint-disable-next-line no-console
+    console.log(id);
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update, id);
@@ -121,8 +123,6 @@ export default class MovieListPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
-        //remove(this.#sortComponent);
-        //remove(this.#loadMoreButtonComponent);
         this.#clearBoard();
         this.#renderBoard();
         break;
@@ -152,7 +152,8 @@ export default class MovieListPresenter {
   }
 
   #renderFilm = (place, card) => {
-    const moviePresenter = new MoviePresenter(place, this.#handleViewAction, this.#handleModeChange);
+
+    const moviePresenter = new MoviePresenter(place, this.#handleViewAction, this.#handleModeChange, this.#commentsModel);
     moviePresenter.init(card, this.#commentsModel.getcomments(card.id));
     this.#filmPresenter.set(card.id, moviePresenter);
   }

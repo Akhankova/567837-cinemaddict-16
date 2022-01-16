@@ -6,10 +6,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import AbstractView from './abstract-view.js';
 
-const createCardFilmTemplate = (card) => {
-  const { title, totalRating, genre, runtime, poster, description, filmDate, isWatchlist, isWatched, isFavorites, comments } = card;
-  // eslint-disable-next-line no-console
-  console.log(comments.length);
+const createCardFilmTemplate = (card, comments) => {
+  const { title, totalRating, genre, runtime, poster, description, filmDate, isWatchlist, isWatched, isFavorites } = card;
   const date = dayjs(filmDate).format('YYYY');
   const filmRuntime = getTime(runtime);
   const descriptionCard = createMessageCard(description);

@@ -18,9 +18,8 @@ export default class ApiService {
   }
 
   getComments(filmId) {
-    filmId = 0;
-    return this.#loadComments({ url: `comments/${filmId}` })
-      .then(ApiService.parseResponse);
+    return this.#loadComments({ url: `comments/${filmId}`})
+      .then(ApiService.parseResponse).then((commentsText) => ({id: filmId, comments: commentsText}));
   }
 
   updateMovie = async (movie) => {
@@ -142,14 +141,10 @@ export default class ApiService {
     delete adaptedCard.filmDate;
     delete adaptedCard.releaseCountry;
     delete adaptedCard.smile;
-    //delete adaptedCard.id;
     delete adaptedCard.value;
     delete adaptedCard.newTextComment;
-    //delete adaptedCard.descriptionCard;
     delete adaptedCard.title;
 
-    // eslint-disable-next-line no-console
-    console.log(adaptedCard);
     return adaptedCard;
   }
 }

@@ -70,8 +70,6 @@ export default class FilmsModel extends AbstractObservable {
   }
 
   adaptToClient(card) {
-    // eslint-disable-next-line no-console
-    console.log(card);
     const adaptedCard = Object.assign(
       {},
       card,

@@ -1,7 +1,6 @@
 import ProfileView from './view/profile-view.js';
 import { RenderPosition, render, remove } from './render.js';
 import FooterView from './view/footer-views';
-import { getCommentText } from './mock/card.js';
 import MovieListPresenter from './presenter/movie-list-presenter.js';
 import FilmsModel from './model/films-model.js';
 import FilterModel from './model/filter-model.js';
@@ -12,22 +11,9 @@ import ApiService from './api-service.js';
 
 const AUTHORIZATION = 'Basic hS2ssS66wcm1sa9j';
 const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
-
+const api = new ApiService(END_POINT, AUTHORIZATION);
 const filmsModel = new FilmsModel(new ApiService(END_POINT, AUTHORIZATION));
-// eslint-disable-next-line no-console
-console.log(filmsModel.films);
-
-const comments = filmsModel.films.reduce((filmComments, film) => {
-  const comment = {
-    id: film.id,
-    comments: film.commentsId.map((id) => getCommentText(id)),
-  };
-  filmComments.push(comment);
-  return filmComments;
-}, []);
-
 const commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
-commentsModel.setcomments(comments);
 
 const filterModel = new FilterModel();
 
@@ -35,8 +21,12 @@ const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const footer = document.querySelector('.footer');
 
-const boardPresenter = new MovieListPresenter(siteMainElement, filmsModel, filterModel, commentsModel);
+filmsModel.addObserver(() => {
+  const comments = filmsModel.films.map((film) => api.getComments(film.id));
+  Promise.all(comments).then((result) => { commentsModel.setcomments(result); });
+});
 
+const boardPresenter = new MovieListPresenter(siteMainElement, filmsModel, filterModel, commentsModel);
 let statisticsComponent = null;
 
 const handleSiteMenuClick = (menuItem) => {
