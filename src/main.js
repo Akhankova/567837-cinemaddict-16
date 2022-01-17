@@ -8,27 +8,16 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import CommentsModel from './model/comments-model.js';
 import StatisticsView from './view/statistics-view.js';
 import ApiService from './api-service.js';
+import {AUTHORIZATION, END_POINT} from './consts.js';
 
-const AUTHORIZATION = 'Basic hS2ssS66wcm1sa9j';
-const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
-const api = new ApiService(END_POINT, AUTHORIZATION);
 const filmsModel = new FilmsModel(new ApiService(END_POINT, AUTHORIZATION));
-const commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION));
-
+const commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION), filmsModel);
 const filterModel = new FilterModel();
 
-const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
-const footer = document.querySelector('.footer');
-
-filmsModel.addObserver(() => {
-  const comments = filmsModel.films.map((film) => api.getComments(film.id));
-  Promise.all(comments).then((result) => { commentsModel.setcomments(result); });
-});
-
 const boardPresenter = new MovieListPresenter(siteMainElement, filmsModel, filterModel, commentsModel);
-let statisticsComponent = null;
 
+let statisticsComponent = null;
 const handleSiteMenuClick = (menuItem) => {
   if (menuItem !== 'stats') {
     remove(statisticsComponent);
@@ -47,7 +36,10 @@ const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsM
 filterPresenter.init();
 boardPresenter.init();
 
+//я удалила загрузку комментов из main, соответственно filmsModel.addObserver тоже. Оставила этот код что ниже в filmsModel.init().finally, надеюсь норм
 filmsModel.init().finally(() => {
+  const siteHeaderElement = document.querySelector('.header');
+  const footer = document.querySelector('.footer');
   render(siteHeaderElement, new ProfileView(filmsModel.films), RenderPosition.BEFOREEND);
   render(footer, new FooterView(filmsModel.films), RenderPosition.BEFOREEND);
 });

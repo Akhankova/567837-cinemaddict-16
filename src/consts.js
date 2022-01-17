@@ -3,6 +3,8 @@ export const CARD_COUNT = 25;
 export const CARD_COUNT_COMMENTED = 2;
 export const CARD_COUNT_RATING = 2;
 export const CARD_COUNT_PER_STEP = 5;
+export const AUTHORIZATION = 'Basic hS2ssS66wcm1sa9j';
+export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 
 export const SortType = {
   DEFAULT: 'default',

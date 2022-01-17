@@ -57,6 +57,8 @@ export default class MoviePresenter {
     this.#filmComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#filmComponent.setCardClickHandler(this.#handleCardClick);
 
+    this.#commentsModel.init();
+
     if (prevFilmComponent === null || prevFilmEditComponent === null) {
       render(this.#filmListContainer, this.#filmComponent, RenderPosition.BEFOREEND);
       return;
@@ -97,7 +99,7 @@ export default class MoviePresenter {
     }
   };
 
-  #onGetFormCardInfoClick = () => {
+  #onGetFormCardInfoClick = async () => {
     if (bodyElement.querySelector('.film-details')) {
       bodyElement.querySelector('.film-details').remove();
     }
@@ -121,7 +123,7 @@ export default class MoviePresenter {
   }
 
   #handleCardClick = () => {
-    this.#comments = this.#commentsModel.getcomments(this.#film.id);
+    //this.#comments = this.#commentsModel.getcomments(this.#film.id);
     this.#onGetFormCardInfoClick();
   }
 

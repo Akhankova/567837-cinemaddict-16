@@ -89,8 +89,6 @@ export default class MovieListPresenter {
   };
 
   #handleViewAction = (actionType, updateType, update, id, newComment) => {
-    // eslint-disable-next-line no-console
-    console.log(id);
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update, id);

@@ -23,6 +23,7 @@ export default class FilmsModel extends AbstractObservable {
     }
     this._notify(UpdateType.INIT);
   }
+  //так и не поняла почему ты оставил тут замечание. Что то неверно в init?
 
   updateFilm = async(updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
@@ -87,21 +88,14 @@ export default class FilmsModel extends AbstractObservable {
         releaseCountry: card['film_info']['release']['release_country'],
         runtime: card['film_info']['runtime'],
         genre: card['film_info']['genre'],
-        //descriptionCard: createMessageCard(textDescription),
         description: card['film_info']['description'],
-        //comments: commentsText.length,
-        //commentsText: commentsText,
         isWatchlist: card['user_details']['watchlist'],
         isWatched: card['user_details']['already_watched'],
-        //watchingDate: getRandomArbitrary(DATE_MAX_WATCH, DATE_MIN_WATCH),
         watchingDate: card['user_details']['watching_date'],
         isFavorites: card['user_details']['favorite'],
-        //smile: '',
 
       },
     );
-
-    // Ненужные ключи мы удаляем
     delete adaptedCard['film_info'];
     delete adaptedCard['user_details'];
     return adaptedCard;

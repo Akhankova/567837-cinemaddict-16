@@ -1,13 +1,16 @@
 import AbstractObservable from '../utils.js';
+import { UpdateType } from '../consts.js';
 
 export default class CommentsModel extends AbstractObservable {
   #apiService = null;
   #filmComments = [];
   #comments = [];
+  #filmsModel = [];
 
-  constructor(apiService) {
+  constructor(apiService, filmsModel) {
     super();
     this.#apiService = apiService;
+    this.#filmsModel = filmsModel;
   }
 
   setcomments(comments) {
@@ -17,21 +20,18 @@ export default class CommentsModel extends AbstractObservable {
 
   getcomments(id) {
     const currentFilm = this.#comments.find((item) => Number(item.id) === Number(id));
-    return  currentFilm && currentFilm.comments ? currentFilm.comments : [];
+    return currentFilm && currentFilm.comments ? currentFilm.comments : [];
   }
 
-  getСommentItems = async (id) => {
-    try {
-      const comments = await this.#apiService.getComments(id);
-      this.#filmComments = [...comments];
-      return this.#filmComments;
-    } catch (err) {
-      this.#filmComments = [];
-    }
-    return this.#filmComments;
+  init = () => {
+    this.#filmsModel.addObserver((type) => {
+      if (type !== UpdateType.INIT) { return; }
+      const comments = this.#filmsModel.films.map((film) => this.#apiService.getComments(film.id));
+      Promise.all(comments).then((result) => { this.setcomments(result); });
+    });
   }
 
-  updateComments = async(updateType, update, comments) => {
+  updateComments = async (updateType, update, comments) => {
     this.#filmComments = comments;
 
     this._notify(updateType, update, this.#filmComments);
