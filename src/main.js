@@ -8,13 +8,23 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import CommentsModel from './model/comments-model.js';
 import StatisticsView from './view/statistics-view.js';
 import ApiService from './api-service.js';
-import {AUTHORIZATION, END_POINT} from './consts.js';
+import { AUTHORIZATION, END_POINT, UpdateType } from './consts.js';
+
+const siteHeaderElement = document.querySelector('.header');
+const footer = document.querySelector('.footer');
+const siteMainElement = document.querySelector('.main');
 
 const filmsModel = new FilmsModel(new ApiService(END_POINT, AUTHORIZATION));
 const commentsModel = new CommentsModel(new ApiService(END_POINT, AUTHORIZATION), filmsModel);
 const filterModel = new FilterModel();
 
-const siteMainElement = document.querySelector('.main');
+filmsModel.addObserver((type) => {
+  if (type !== UpdateType.INIT) { return; }
+  commentsModel.init();
+  render(siteHeaderElement, new ProfileView(filmsModel.films), RenderPosition.BEFOREEND);
+  render(footer, new FooterView(filmsModel.films), RenderPosition.BEFOREEND);
+});
+
 const boardPresenter = new MovieListPresenter(siteMainElement, filmsModel, filterModel, commentsModel);
 
 let statisticsComponent = null;
@@ -35,11 +45,5 @@ const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsM
 
 filterPresenter.init();
 boardPresenter.init();
+filmsModel.init();
 
-//я удалила загрузку комментов из main, соответственно filmsModel.addObserver тоже. Оставила этот код что ниже в filmsModel.init().finally, надеюсь норм
-filmsModel.init().finally(() => {
-  const siteHeaderElement = document.querySelector('.header');
-  const footer = document.querySelector('.footer');
-  render(siteHeaderElement, new ProfileView(filmsModel.films), RenderPosition.BEFOREEND);
-  render(footer, new FooterView(filmsModel.films), RenderPosition.BEFOREEND);
-});
