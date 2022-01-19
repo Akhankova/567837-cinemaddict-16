@@ -1,4 +1,4 @@
-import {getTime, createMessageCard} from '../utils.js';
+import { getTime, createMessageCard } from '../utils.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -7,7 +7,7 @@ dayjs.extend(relativeTime);
 import AbstractView from './abstract-view.js';
 
 const createCardFilmTemplate = (card, comments) => {
-  const {title, totalRating, genre, runtime, poster, description, filmDate, isWatchlist, isWatched, isFavorites} = card;
+  const { title, totalRating, genre, runtime, poster, description, filmDate, isWatchlist, isWatched, isFavorites } = card;
   const date = dayjs(filmDate).format('YYYY');
   const filmRuntime = getTime(runtime);
   const descriptionCard = createMessageCard(description);

@@ -14,6 +14,7 @@ export default class MoviePresenter {
   #filmListContainer = null;
   #changeData = null;
   #changeMode = null;
+  #commentsModel = null;
 
   #filmComponent = null;
   #filmEditComponent = null;
@@ -24,11 +25,13 @@ export default class MoviePresenter {
   #newCommentText = '';
   #mode = Mode.DEFAULT;
   #scroll = null;
+  #com = null;
 
-  constructor(filmListContainer, changeData, changeMode) {
+  constructor(filmListContainer, changeData, changeMode, commentsModel) {
     this.#filmListContainer = filmListContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
+    this.#commentsModel = commentsModel;
   }
 
   init = (film, comments) => {
@@ -36,22 +39,23 @@ export default class MoviePresenter {
     this.#comments = comments;
     const prevFilmComponent = this.#filmComponent;
     const prevFilmEditComponent = this.#filmEditComponent;
-    this.#filmComponent = new CardFilmView(film, comments);
-    this.#filmEditComponent = new FilmInfotmationView(film, comments, this.#emotion, this.#newCommentText, this.#scroll);
-    this.#filmComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
-    this.#filmComponent.setHistoryClickHandler(this.#handleHistoryClick);
-    this.#filmComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#filmComponent = new CardFilmView(film, this.#comments);
 
+    this.#filmEditComponent = new FilmInfotmationView(film, this.#comments, this.#emotion, this.#newCommentText, this.#scroll);
     this.#filmEditComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#filmEditComponent.setHistoryClickHandler(this.#handleHistoryClick);
     this.#filmEditComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
-
-    this.#filmComponent.setCardClickHandler(this.#handleCardClick);
     this.#filmEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#filmEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
     this.#filmEditComponent.setAddClickHandler(this.#handleAddClick);
     this.#filmEditComponent.setCommentsEmotionHandler(this.#handleGetCommentsEmotion);
     this.#filmEditComponent.setCommentNewTextHandler(this.#handleGetCommentText);
+
+
+    this.#filmComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#filmComponent.setHistoryClickHandler(this.#handleHistoryClick);
+    this.#filmComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#filmComponent.setCardClickHandler(this.#handleCardClick);
 
     if (prevFilmComponent === null || prevFilmEditComponent === null) {
       render(this.#filmListContainer, this.#filmComponent, RenderPosition.BEFOREEND);
@@ -93,11 +97,12 @@ export default class MoviePresenter {
     }
   };
 
-  #onGetFormCardInfoClick = () => {
+  #onGetFormCardInfoClick = async () => {
     if (bodyElement.querySelector('.film-details')) {
       bodyElement.querySelector('.film-details').remove();
     }
     bodyElement.classList.add('hide-overflow');
+    this.#comments = this.#commentsModel.getcomments(this.#film.id);
     bodyElement.appendChild(this.#filmEditComponent.element, RenderPosition.BEFOREEND);
     document.addEventListener('keydown', this.#onEscKeyDown);
     this.#changeMode();
@@ -131,7 +136,8 @@ export default class MoviePresenter {
     this.#changeData(
       bodyElement.querySelector('.film-details') ? UserAction.UPDATE_FILM_WITH_COMMENTS : UserAction.UPDATE_FILM,
       bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
-      { ...this.#film, isFavorites: !this.#film.isFavorites }, this.#comments);
+      { ...this.#film, isFavorites: !this.#film.isFavorites },
+      this.#comments);
   }
 
   #handleHistoryClick = (comments, scroll) => {
