@@ -82,13 +82,9 @@ export default class MovieListPresenter {
     this.#commentsModel.removeObserver(this.#handleModelEvent);
   }
 
-  getComments = async (card) => {
-    const commentsPromise = await this.#commentsModel.getСommentItems(card.id);
-    const carsComments = [...commentsPromise];
-    return carsComments;
-  };
-
   #handleViewAction = (actionType, updateType, update, id, newComment) => {
+    // eslint-disable-next-line no-console
+    console.log(id);
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this.#filmsModel.updateFilm(updateType, update, id);

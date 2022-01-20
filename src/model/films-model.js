@@ -1,5 +1,5 @@
 import AbstractObservable from '../utils.js';
-import {UpdateType} from '../consts.js';
+import { UpdateType } from '../consts.js';
 
 export default class FilmsModel extends AbstractObservable {
   #films = [];
@@ -18,16 +18,14 @@ export default class FilmsModel extends AbstractObservable {
     try {
       const films = await this.#apiService.movies;
       this.#films = films.map(this.adaptToClient);
-    } catch(err) {
+    } catch (err) {
       this.#films = [];
     }
     this._notify(UpdateType.INIT);
   }
-  //так и не поняла почему ты оставил тут замечание. Что то неверно в init?
 
-  updateFilm = async(updateType, update) => {
+  updateFilm = async (updateType, update, comments) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
-
     if (index === -1) {
       throw new Error('Can\'t update unexisting film');
     }
@@ -40,8 +38,8 @@ export default class FilmsModel extends AbstractObservable {
         update,
         ...this.#films.slice(index + 1),
       ];
-      this._notify(updateType, updatedMovie);
-    } catch(err) {
+      this._notify(updateType, updatedMovie, comments);
+    } catch (err) {
       throw new Error('Can\'t update task');
     }
   }

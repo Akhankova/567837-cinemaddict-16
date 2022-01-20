@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import FilmInfotmationView from '../view/film-information';
 import { render, RenderPosition, remove, replace } from '../render';
 import CardFilmView from '../view/card-film-views';
@@ -159,6 +160,8 @@ export default class MoviePresenter {
   }
 
   #handleDeleteClick = (film, id, comments, scroll) => {
+    // eslint-disable-next-line no-console
+    console.log(comments);
     this.#scroll = scroll;
     this.#changeData(
       UserAction.DELETE_COMMENT,
@@ -167,6 +170,7 @@ export default class MoviePresenter {
       id,
       comments,
     );
+    this.#scroll = scroll;
   }
 
   #handleAddClick = (film, comment, comments, emotionNew, commentTextNew, scroll) => {

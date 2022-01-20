@@ -6,7 +6,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import { getTime } from '../utils.js';
 import SmartView from './smart-view.js';
-import { nanoid } from 'nanoid';
 
 const creatCommentCountTemplate = (comments) => comments > 0 ? `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>` : ' ';
 const createFilmPopupCommentsTemplate = (commentLi) => {
@@ -14,19 +13,19 @@ const createFilmPopupCommentsTemplate = (commentLi) => {
     id,
     author,
     comment,
-    dateComment,
+    date,
     emotion
   } = commentLi;
   return (
     `<li class="film-details__comment" id="${id}">
     <span class="film-details__comment-emoji">
-      <img src="/images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
+      <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
     </span>
     <div>
       <p class="film-details__comment-text">${comment}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${dateComment}</span>
+        <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
         <button class="film-details__comment-delete">Delete</button>
       </p>
     </div>
@@ -263,11 +262,11 @@ export default class FilmInfotmationView extends SmartView {
 
   createNewComment() {
     return {
-      id: nanoid(),
+      id: '',
       author: 'Alex Ivanov',
       comment: he.encode(this._data.commentText),
-      dateComment: dayjs().fromNow(),
-      emotion: `./images/emoji/${this._data.commentEmotion}.png`,
+      date: dayjs(),
+      emotion: this._data.commentEmotion,
     };
   }
 

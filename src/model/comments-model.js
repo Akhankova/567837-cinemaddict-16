@@ -35,33 +35,40 @@ export default class CommentsModel extends AbstractObservable {
     this.#filmComments = comments;
 
     this._notify(updateType, update, this.#filmComments);
+
   }
 
-  addComment(updateType, update, newComment, comments) {
+  async addComment(updateType, update, newComment, comments) {
     this.#filmComments = comments;
-
-    this.#filmComments = [
-      ...this.#filmComments,
-      newComment,
-    ];
-
-    this._notify(updateType, update, this.#filmComments);
+    try {
+      const response = await this.#apiService.addComment(newComment, update);
+      this.#filmComments = [
+        ...this.#filmComments,
+        response.comments[response.comments.length -1],
+      ];
+      this._notify(updateType, update, this.#filmComments);
+    } catch (err) {
+      throw new Error('Can\'t add comment');
+    }
   }
 
-  deleteComment(updateType, update, id, comments) {
+  async deleteComment(updateType, update, id, comments) {
     this.#filmComments = comments;
     const index = this.#filmComments.findIndex((comment) => comment.id === id);
-
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
-    this.#filmComments = [
-      ...this.#filmComments.slice(0, index),
-      ...this.#filmComments.slice(index + 1),
-    ];
-
-    this._notify(updateType, update, this.#filmComments);
+    try {
+      await this.#apiService.deleteComment(this.#filmComments[index]);
+      this.#filmComments = [
+        ...this.#filmComments.slice(0, index),
+        ...this.#filmComments.slice(index + 1),
+      ];
+      this._notify(updateType, update, this.#filmComments);
+    } catch (err) {
+      throw new Error('Can\'t delete comment');
+    }
   }
 
   adaptCommentToClient(comment) {
@@ -69,7 +76,7 @@ export default class CommentsModel extends AbstractObservable {
       {},
       comment,
       {
-        id: comment['id'],
+        id: String(comment['id']),
         author: comment['author'],
         emotion: comment['emotion'],
         comment: comment['comment'],
@@ -77,12 +84,13 @@ export default class CommentsModel extends AbstractObservable {
       },
     );
 
-    delete comment['id'];
+    //delete comment['id'];
     delete comment['author'];
     delete comment['emotion'];
     delete comment['comment'];
     delete comment['date'];
-
+    // eslint-disable-next-line no-console
+    console.log(adaptedComment);
     return adaptedComment;
   }
 

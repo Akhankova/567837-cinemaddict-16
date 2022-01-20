@@ -1,6 +1,8 @@
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class ApiService {
@@ -18,8 +20,8 @@ export default class ApiService {
   }
 
   getComments(filmId) {
-    return this.#loadComments({ url: `comments/${filmId}`})
-      .then(ApiService.parseResponse).then((commentsText) => ({id: filmId, comments: commentsText}));
+    return this.#loadComments({ url: `comments/${filmId}` })
+      .then(ApiService.parseResponse).then((commentsText) => ({ id: filmId, comments: commentsText }));
   }
 
   updateMovie = async (movie) => {
@@ -28,6 +30,41 @@ export default class ApiService {
       method: Method.PUT,
       body: JSON.stringify(this.adaptToServer(movie)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  }
+
+  addComment = async (comment, film) => {
+    const response = await this.#load({
+      url: `comments/${film.id}`,
+      method: Method.POST,
+      body: JSON.stringify(this.adaptCommentToServer(comment)),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    });
+    const parsedResponse = await ApiService.parseResponse(response);
+    // eslint-disable-next-line no-console
+    console.log(parsedResponse);
+    return parsedResponse;
+  }
+
+  deleteComment = async (comment) => {
+    const response = await this.#load({
+      url: `comments/${comment.id}`,
+      method: Method.DELETE,
+    });
+
+    return response;
+  }
+
+  updateComments = async (film, comment) => {
+    const response = await this.#load({
+      url: `comments/${film.id}`,
+      method: Method.PUT,
+      body: JSON.stringify(this.adaptCommentToServer(comment)),
+      headers: new Headers({'Content-Type': 'application/json'}),
     });
 
     const parsedResponse = await ApiService.parseResponse(response);
@@ -146,5 +183,22 @@ export default class ApiService {
     delete adaptedCard.title;
 
     return adaptedCard;
+  }
+
+  adaptCommentToServer(comment) {
+
+    const adaptedComment = Object.assign(
+      {},
+      //comment,
+      {
+        ['emotion']: comment.emotion,
+        ['comment']: comment.comment,
+      },
+    );
+    delete adaptedComment.id;
+    delete adaptedComment.date;
+    // eslint-disable-next-line no-console
+    console.log(adaptedComment);
+    return adaptedComment;
   }
 }
