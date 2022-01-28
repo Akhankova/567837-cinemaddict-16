@@ -94,6 +94,7 @@ export default class MovieListPresenter {
         this.#filmPresenter.get(update.id).setViewState(MoviePresenterViewState.SAVING, id);
         try {
           await this.#commentsModel.addComment(updateType, update, id, newComment);
+          this.#filmPresenter.get(update.id).setViewState(MoviePresenterViewState.SUCCESS);
         } catch (err) {
           this.#filmPresenter.get(update.id).setViewState(MoviePresenterViewState.ABORTING_NEW_COMMENT);
         }

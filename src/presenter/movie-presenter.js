@@ -13,6 +13,7 @@ export const State = {
   ABORTING: 'ABORTING',
   ABORTING_NEW_COMMENT: 'ABORTING_NEW_COMMENT',
   SAVING: 'SAVING',
+  SUCCESS: 'SUCCESS',
 };
 
 const bodyElement = document.querySelector('body');
@@ -110,6 +111,11 @@ export default class MoviePresenter {
     };
 
     switch (state) {
+      case State.SUCCESS:
+        this.#filmEditComponent.resetDataForNewComment();
+        this.#emotion = ' ';
+        this.#newCommentText = '';
+        break;
       case State.SAVING:
         this.#isDisabled = false;
         this.#filmEditComponent.updateData({

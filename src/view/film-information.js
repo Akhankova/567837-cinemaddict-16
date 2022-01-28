@@ -265,13 +265,19 @@ export default class FilmInformationView extends SmartView {
     });
   }
 
+  resetDataForNewComment = () => {
+    this.#emotionNew = ' ';
+    this.#commentTextNew = '';
+    this.updateData({...this._data});
+  }
+
   createNewComment() {
     return {
       id: '',
       author: 'Alex Ivanov',
-      comment: he.encode(this._data.commentText),
+      comment: he.encode(this.#commentTextNew),
       date: dayjs(),
-      emotion: this._data.commentEmotion,
+      emotion: this.#emotionNew,
     };
   }
 
@@ -280,9 +286,8 @@ export default class FilmInformationView extends SmartView {
       if (this.#emotionNew !== ' ' && this.#commentTextNew !== '') {
         this.#isDisabled = true;
         const newComment = this.createNewComment();
-        this.#emotionNew = ' ';
-        this.#commentTextNew = '';
         this._callback.addClick(FilmInformationView.parseFilmToData(this._data), newComment, FilmInformationView.parseCommentsToData(this.#comments), this.#emotionNew, this.#commentTextNew, this.#isDisabled);
+        document.removeEventListener('keypress', this.#formAddClickHandler);
       }
     }
   }
