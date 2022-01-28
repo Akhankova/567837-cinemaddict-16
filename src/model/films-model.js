@@ -21,13 +21,14 @@ export default class FilmsModel extends AbstractObservable {
     } catch (err) {
       this.#films = [];
     }
-    this._notify(UpdateType.INIT);
+    this._notify(UpdateType.INIT, this.#films);
   }
 
   updateFilm = async (updateType, update, comments) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
+
     if (index === -1) {
-      throw new Error('Can\'t update unexisting film');
+      throw new Error('Can\'t update film');
     }
 
     try {
@@ -40,32 +41,8 @@ export default class FilmsModel extends AbstractObservable {
       ];
       this._notify(updateType, updatedMovie, comments);
     } catch (err) {
-      throw new Error('Can\'t update task');
+      throw new Error('Can\'t update film');
     }
-  }
-
-  addFilm = (updateType, update) => {
-    this.#films = [
-      update,
-      ...this.#films,
-    ];
-
-    this._notify(updateType, update);
-  }
-
-  deleteFilm = (updateType, update) => {
-    const index = this.#films.findIndex((film) => film.id === update.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting task');
-    }
-
-    this.#films = [
-      ...this.#films.slice(0, index),
-      ...this.#films.slice(index + 1),
-    ];
-
-    this._notify(updateType);
   }
 
   adaptToClient(card) {

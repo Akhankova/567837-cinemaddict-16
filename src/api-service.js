@@ -31,10 +31,7 @@ export default class ApiService {
       body: JSON.stringify(this.adaptToServer(movie)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
-
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   }
 
   addComment = async (comment, film) => {
@@ -44,10 +41,7 @@ export default class ApiService {
       body: JSON.stringify(this.adaptCommentToServer(comment)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
-    const parsedResponse = await ApiService.parseResponse(response);
-    // eslint-disable-next-line no-console
-    console.log(parsedResponse);
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   }
 
   deleteComment = async (comment) => {
@@ -67,9 +61,7 @@ export default class ApiService {
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   }
 
   #load = async ({
@@ -158,9 +150,6 @@ export default class ApiService {
         },
       },
     );
-
-    delete adaptedCard.filmInfo;
-    delete adaptedCard.userDetails;
     delete adaptedCard.alternativeTitle;
     delete adaptedCard.totalRating;
     delete adaptedCard.poster;
@@ -179,7 +168,6 @@ export default class ApiService {
     delete adaptedCard.releaseCountry;
     delete adaptedCard.smile;
     delete adaptedCard.value;
-    delete adaptedCard.newTextComment;
     delete adaptedCard.title;
 
     return adaptedCard;
@@ -189,7 +177,6 @@ export default class ApiService {
 
     const adaptedComment = Object.assign(
       {},
-      //comment,
       {
         ['emotion']: comment.emotion,
         ['comment']: comment.comment,
@@ -197,8 +184,6 @@ export default class ApiService {
     );
     delete adaptedComment.id;
     delete adaptedComment.date;
-    // eslint-disable-next-line no-console
-    console.log(adaptedComment);
     return adaptedComment;
   }
 }

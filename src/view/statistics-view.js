@@ -201,8 +201,8 @@ export default class StatisticsView extends SmartView {
     if (this.#statisticChart !== null) {
       this.#statisticChart = null;
     }
-    const stytisticCtx = this.element.querySelector('.statistic__chart');
-    this.#statisticChart = renderGenresChart(stytisticCtx, this._data);
+    const statisticCtx = this.element.querySelector('.statistic__chart');
+    this.#statisticChart = renderGenresChart(statisticCtx, this._data);
   }
 }
 

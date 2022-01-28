@@ -21,22 +21,25 @@ const filterModel = new FilterModel();
 filmsModel.addObserver((type) => {
   if (type !== UpdateType.INIT) { return; }
   commentsModel.init();
-  render(siteHeaderElement, new ProfileView(filmsModel.films), RenderPosition.BEFOREEND);
   render(footer, new FooterView(filmsModel.films), RenderPosition.BEFOREEND);
 });
 
-const boardPresenter = new MovieListPresenter(siteMainElement, filmsModel, filterModel, commentsModel);
+const boardPresenter = new MovieListPresenter(filmsModel.films, siteHeaderElement, siteMainElement, filmsModel, filterModel, commentsModel);
 
 let statisticsComponent = null;
+let profileComponent = null;
 const handleSiteMenuClick = (menuItem) => {
   if (menuItem !== 'stats') {
     remove(statisticsComponent);
+    remove(profileComponent);
     boardPresenter.destroy();
     boardPresenter.init();
   }
   if (menuItem === 'stats') {
     boardPresenter.destroy();
     statisticsComponent = new StatisticsView(filmsModel.films);
+    profileComponent = new ProfileView(filmsModel.films);
+    render(siteHeaderElement, profileComponent, RenderPosition.BEFOREEND);
     render(siteMainElement, statisticsComponent, RenderPosition.BEFOREEND);
   }
 };

@@ -7,7 +7,6 @@ export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
   #filmsModel = null;
-
   #filterComponent = null;
   #statisticsHandler = null;
 
@@ -16,7 +15,6 @@ export default class FilterPresenter {
     this.#filterModel = filterModel;
     this.#filmsModel = filmsModel;
     this.#statisticsHandler = statisticsHandler;
-
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -31,9 +29,9 @@ export default class FilterPresenter {
         count: filter[FilterType.ALL](films).length,
       },
       {
-        type: FilterType.WATHLIST,
-        name: 'Wathlist',
-        count: filter[FilterType.WATHLIST](films).length,
+        type: FilterType.WATCHLIST,
+        name: 'Watchlist',
+        count: filter[FilterType.WATCHLIST](films).length,
       },
       {
         type: FilterType.HISTORY,
