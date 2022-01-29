@@ -1,6 +1,8 @@
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class ApiService {
@@ -18,8 +20,8 @@ export default class ApiService {
   }
 
   getComments(filmId) {
-    return this.#loadComments({ url: `comments/${filmId}`})
-      .then(ApiService.parseResponse).then((commentsText) => ({id: filmId, comments: commentsText}));
+    return this.#loadComments({ url: `comments/${filmId}` })
+      .then(ApiService.parseResponse).then((commentsText) => ({ id: filmId, comments: commentsText }));
   }
 
   updateMovie = async (movie) => {
@@ -29,10 +31,37 @@ export default class ApiService {
       body: JSON.stringify(this.adaptToServer(movie)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
+    return await ApiService.parseResponse(response);
+  }
 
-    const parsedResponse = await ApiService.parseResponse(response);
+  addComment = async (comment, film) => {
+    const response = await this.#load({
+      url: `comments/${film.id}`,
+      method: Method.POST,
+      body: JSON.stringify(this.adaptCommentToServer(comment)),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    });
+    return await ApiService.parseResponse(response);
+  }
 
-    return parsedResponse;
+  deleteComment = async (comment) => {
+    const response = await this.#load({
+      url: `comments/${comment.id}`,
+      method: Method.DELETE,
+    });
+
+    return response;
+  }
+
+  updateComments = async (film, comment) => {
+    const response = await this.#load({
+      url: `comments/${film.id}`,
+      method: Method.PUT,
+      body: JSON.stringify(this.adaptCommentToServer(comment)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    return await ApiService.parseResponse(response);
   }
 
   #load = async ({
@@ -121,9 +150,6 @@ export default class ApiService {
         },
       },
     );
-
-    delete adaptedCard.filmInfo;
-    delete adaptedCard.userDetails;
     delete adaptedCard.alternativeTitle;
     delete adaptedCard.totalRating;
     delete adaptedCard.poster;
@@ -142,9 +168,22 @@ export default class ApiService {
     delete adaptedCard.releaseCountry;
     delete adaptedCard.smile;
     delete adaptedCard.value;
-    delete adaptedCard.newTextComment;
     delete adaptedCard.title;
 
     return adaptedCard;
+  }
+
+  adaptCommentToServer(comment) {
+
+    const adaptedComment = Object.assign(
+      {},
+      {
+        ['emotion']: comment.emotion,
+        ['comment']: comment.comment,
+      },
+    );
+    delete adaptedComment.id;
+    delete adaptedComment.date;
+    return adaptedComment;
   }
 }

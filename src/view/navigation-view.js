@@ -51,25 +51,4 @@ export default class NavigationView extends AbstractView {
     }
     this._callback.filterTypeChange(evt.target.name);
   }
-
-  /*setMenuClickHandler = (callback) => {
-    this._callback.menuClick = callback;
-    this.element.addEventListener('click', this.#menuClickHandler);
-  }
-
-  setMenuItem = (menuItem) => {
-    const item = this.element.querySelector(`[value=${menuItem}]`);
-
-    if (item !== null) {
-      item.checked = true;
-    }
-  }
-
-  #menuClickHandler = (evt) => {
-    evt.preventDefault();
-    // eslint-disable-next-line no-console
-    console.log(evt.target.value);
-    this._callback.menuClick(evt.target.value);
-  }*/
-
 }

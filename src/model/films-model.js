@@ -1,5 +1,5 @@
 import AbstractObservable from '../utils.js';
-import {UpdateType} from '../consts.js';
+import { UpdateType } from '../consts.js';
 
 export default class FilmsModel extends AbstractObservable {
   #films = [];
@@ -18,18 +18,17 @@ export default class FilmsModel extends AbstractObservable {
     try {
       const films = await this.#apiService.movies;
       this.#films = films.map(this.adaptToClient);
-    } catch(err) {
+    } catch (err) {
       this.#films = [];
     }
-    this._notify(UpdateType.INIT);
+    this._notify(UpdateType.INIT, this.#films);
   }
-  //так и не поняла почему ты оставил тут замечание. Что то неверно в init?
 
-  updateFilm = async(updateType, update) => {
+  updateFilm = async (updateType, update, comments) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting film');
+      throw new Error('Can\'t update film');
     }
 
     try {
@@ -40,34 +39,10 @@ export default class FilmsModel extends AbstractObservable {
         update,
         ...this.#films.slice(index + 1),
       ];
-      this._notify(updateType, updatedMovie);
-    } catch(err) {
-      throw new Error('Can\'t update task');
+      this._notify(updateType, updatedMovie, comments);
+    } catch (err) {
+      throw new Error('Can\'t update film');
     }
-  }
-
-  addFilm = (updateType, update) => {
-    this.#films = [
-      update,
-      ...this.#films,
-    ];
-
-    this._notify(updateType, update);
-  }
-
-  deleteFilm = (updateType, update) => {
-    const index = this.#films.findIndex((film) => film.id === update.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting task');
-    }
-
-    this.#films = [
-      ...this.#films.slice(0, index),
-      ...this.#films.slice(index + 1),
-    ];
-
-    this._notify(updateType);
   }
 
   adaptToClient(card) {

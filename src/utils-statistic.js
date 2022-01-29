@@ -13,7 +13,7 @@ export const statisticsPeriod = {
   YEAR: 'year',
 };
 
-export const filterMoviesPeriod = (cards, dateTo, dateFrom, currentInput) => {
+export const getFilterMoviesPeriod = (cards, dateTo, dateFrom, currentInput) => {
   if(currentInput === statisticsPeriod.ALL_TIME){
     return cards.filter((card) => dayjs(card.watchingDate).isSameOrBefore(dayjs()));
   }
@@ -38,14 +38,14 @@ export const filterMoviesPeriod = (cards, dateTo, dateFrom, currentInput) => {
 
 export const getWatchedFilmsForStatistics = (cards, dateTo, dateFrom, currentInput) => {
   const watchedFilmsStat = {
-    cards: new Array(),
-    movies: new Array(),
-    genres: new Array(),
-    filmsCountWithSameGanres: new Array(),
+    cards: [],
+    movies: [],
+    genres: [],
+    filmsCountWithSameGenres: [],
   };
   watchedFilmsStat.cards = cards.filter((card) => card.isWatched);
   cards = cards.filter((card) => card.isWatched);
-  watchedFilmsStat.movies = filterMoviesPeriod(cards, dateTo, dateFrom, currentInput);
+  watchedFilmsStat.movies = getFilterMoviesPeriod(cards, dateTo, dateFrom, currentInput);
   const filmsGenres = [];
   watchedFilmsStat.movies.filter((film) => filmsGenres.push(film.genre));
   watchedFilmsStat.genres = filmsGenres.flat().reduce((acc, el) => {

@@ -1,7 +1,4 @@
 export const MINUTES = 60;
-export const CARD_COUNT = 25;
-export const CARD_COUNT_COMMENTED = 2;
-export const CARD_COUNT_RATING = 2;
 export const CARD_COUNT_PER_STEP = 5;
 export const AUTHORIZATION = 'Basic hS2ssS66wcm1sa9j';
 export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
@@ -28,7 +25,7 @@ export const UpdateType = {
 
 export const FilterType = {
   ALL: 'All',
-  WATHLIST: 'Wathlist',
+  WATCHLIST: 'Watchlist',
   HISTORY: 'History',
   FAVORITES: 'Favorites',
   STATISTICS: 'Statistics',
@@ -39,4 +36,10 @@ export const MenuItem = {
   STATISTICS: 'STATISTICS',
 };
 
+export const NoCardsTextType = {
+  [FilterType.ALL]: 'There are no movies in our database',
+  [FilterType.HISTORY]: 'There are no watched movies now',
+  [FilterType.WATCHLIST]: 'There are no movies to watch now',
+  [FilterType.FAVORITES]: 'There are no favorite movies now',
+};
 
