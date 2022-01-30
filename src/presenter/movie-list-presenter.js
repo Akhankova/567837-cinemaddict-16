@@ -10,6 +10,7 @@ import { RenderPosition, render, remove, getSortRateCard, getSortDateCard } from
 import { filter } from '../utils.js';
 import LoadingView from '../view/loading-view.js';
 import ProfileView from '../view/profile-view.js';
+import { MIN_FILM_COUNT } from '../consts';
 
 
 export default class MovieListPresenter {
@@ -18,31 +19,28 @@ export default class MovieListPresenter {
   #commentsModel = null;
   #filterModel = null;
   #noCardComponent = null;
+  #profileViewComponent = null;
+  #sortComponent = null;
+  #loadMoreButtonComponent = null;
+  #siteHeaderElement = null;
 
   #loadingComponent = new LoadingView();
   #boardComponent = new BoardFilmsView();
   #filmsContainerComponent = new FilmsContainerView();
   #filmsListComponent = new FilmsListView();
-  #profileViewComponent = null;
-
-  #sortComponent = null;
-  #loadMoreButtonComponent = null;
 
   #renderedFilmCount = CARD_COUNT_PER_STEP;
   #currentSortType = SortType.DEFAULT;
   #filmPresenter = new Map();
   #filterType = FilterType.ALL;
   #isLoading = true;
-  #siteHeaderElement = null;
-  #films = null;
 
-  constructor(films, siteHeaderElement, boardContainer, filmsModel, filterModel, commentsModel) {
+  constructor(siteHeaderElement, boardContainer, filmsModel, filterModel, commentsModel) {
     this.#siteHeaderElement = siteHeaderElement;
     this.#boardContainer = boardContainer;
     this.#filmsModel = filmsModel;
     this.#filterModel = filterModel;
     this.#commentsModel = commentsModel;
-    this.#films = films;
   }
 
   get films() {
@@ -91,7 +89,7 @@ export default class MovieListPresenter {
         await this.#commentsModel.updateComments(updateType, update, id);
         break;
       case UserAction.ADD_COMMENT:
-        this.#filmPresenter.get(update.id).setViewState(MoviePresenterViewState.SAVING, id);
+        this.#filmPresenter.get(update.id).setViewState(MoviePresenterViewState.SAVING);
         try {
           await this.#commentsModel.addComment(updateType, update, id, newComment);
           this.#filmPresenter.get(update.id).setViewState(MoviePresenterViewState.SUCCESS);
@@ -110,10 +108,10 @@ export default class MovieListPresenter {
     }
   }
 
-  #handleModelEvent = (updateType, data, comments, id) => {
+  #handleModelEvent = (updateType, data, comments) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#filmPresenter.get(data.id).init(data, comments, id);
+        this.#filmPresenter.get(data.id).init(data, comments);
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
@@ -241,11 +239,11 @@ export default class MovieListPresenter {
     const filmCount = films.length;
     this.#renderProfile();
     this.#renderSort();
-    if (filmCount === 0) {
+    if (filmCount === MIN_FILM_COUNT) {
       this.#renderNoFilms();
       return;
     }
-    this.#renderFilms(films.slice(0, Math.min(filmCount, this.#renderedFilmCount)));
+    this.#renderFilms(films.slice(MIN_FILM_COUNT, Math.min(filmCount, this.#renderedFilmCount)));
 
     if (filmCount > this.#renderedFilmCount) {
       this.#renderLoadMoreButton();

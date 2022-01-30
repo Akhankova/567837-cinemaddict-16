@@ -2,11 +2,19 @@ export const MINUTES = 60;
 export const CARD_COUNT_PER_STEP = 5;
 export const AUTHORIZATION = 'Basic hS2ssS66wcm1sa9j';
 export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
+export const MIN_FILM_COUNT = 0;
 
 export const SortType = {
   DEFAULT: 'default',
   DATE_SORT: 'date-sort',
   RATING_SORT: 'rating-sort',
+};
+
+export const IndexComments = {
+  FOR_LAST_INDEX: 1,
+  NOT_FOUND_INDEX: -1,
+  MIN_INDEX: 0,
+  INDEX_VALUE: 1,
 };
 
 export const UserAction = {

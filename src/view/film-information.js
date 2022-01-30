@@ -7,7 +7,11 @@ dayjs.extend(relativeTime);
 import { getTime } from '../utils.js';
 import SmartView from './smart-view.js';
 
-const creatCommentCountTemplate = (comments) => comments > 0 ? `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>` : ' ';
+const MIN_COMMENTS_LENGTH = 0;
+const KEY_CODE_1 = 13;
+const KEY_CODE_2 = 10;
+
+const creatCommentCountTemplate = (comments) => comments > MIN_COMMENTS_LENGTH ? `<h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>` : ' ';
 const createFilmPopupCommentsTemplate = (commentLi, isDeleting) => {
   const {
     id,
@@ -32,9 +36,9 @@ const createFilmPopupCommentsTemplate = (commentLi, isDeleting) => {
     </div>
     </li>`);
 };
-const createFilmPopupAllCommentsTemplate = (commentsText, isDeleting, idCommentDelete) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment, isDeleting, idCommentDelete)).join(' ');
+const createFilmPopupAllCommentsTemplate = (commentsText, isDeleting) => commentsText.map((comment) => createFilmPopupCommentsTemplate(comment, isDeleting)).join(' ');
 
-const createFilmInformationTemplate = (data, comments, emotionNew, commentTextNew, isDeleting, idCommentDelete, isDisabled) => {
+const createFilmInformationTemplate = (data, comments, emotionNew, commentTextNew, isDeleting, isDisabled) => {
   const { title, poster, alternativeTitle, totalRating, director, writers, actors, filmDate, runtime, releaseCountry, genre, description, ageRating, isWatchlist, isWatched, isFavorites } = data;
   const filmRuntime = getTime(runtime);
   const date = dayjs(filmDate).format('DD MMMM YYYY');
@@ -121,7 +125,7 @@ const createFilmInformationTemplate = (data, comments, emotionNew, commentTextNe
       <section class="film-details__comments-wrap">
         ${creatCommentCountTemplate(comments.length)}
         <ul class="film-details__comments-list">
-        ${createFilmPopupAllCommentsTemplate(comments, isDeleting, idCommentDelete)}
+        ${createFilmPopupAllCommentsTemplate(comments, isDeleting)}
         </ul>
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
@@ -160,11 +164,10 @@ export default class FilmInformationView extends SmartView {
   #comments = null;
   #emotionNew = null;
   #commentTextNew = null;
-  #idCommentDelete = null;
   #isDeleting = null;
   #isDisabled = null;
 
-  constructor(film, comments, emotionNew, commentTextNew, isDeleting, idCommentDelete, isDisabled) {
+  constructor(film, comments, emotionNew, commentTextNew, isDeleting, isDisabled) {
     super();
     this._data = FilmInformationView.parseFilmToData(film);
     this.#comments = FilmInformationView.parseCommentsToData(comments);
@@ -172,12 +175,11 @@ export default class FilmInformationView extends SmartView {
     this.#commentTextNew = commentTextNew;
     this.#isDeleting = isDeleting;
     this.#isDisabled = isDisabled;
-    this.#idCommentDelete = idCommentDelete;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createFilmInformationTemplate(this._data, this.#comments, this.#emotionNew, this.#commentTextNew, this.#isDeleting, this.#idCommentDelete, this.#isDisabled);
+    return createFilmInformationTemplate(this._data, this.#comments, this.#emotionNew, this.#commentTextNew, this.#isDeleting, this.#isDisabled);
   }
 
   reset = (film, comments) => {
@@ -282,7 +284,7 @@ export default class FilmInformationView extends SmartView {
   }
 
   #formAddClickHandler = (evt) => {
-    if (evt.keyCode === 13 && (evt.metaKey || evt.ctrlKey) && (evt.keyCode === 13 || evt.keyCode === 10) && (evt.metaKey || evt.ctrlKey)) {
+    if (evt.keyCode === KEY_CODE_1 && (evt.metaKey || evt.ctrlKey) && (evt.keyCode === KEY_CODE_1 || evt.keyCode === KEY_CODE_2) && (evt.metaKey || evt.ctrlKey)) {
       if (this.#emotionNew !== ' ' && this.#commentTextNew !== '') {
         this.#isDisabled = true;
         const newComment = this.createNewComment();

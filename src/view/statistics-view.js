@@ -7,15 +7,17 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const MINUTES = 60;
 const BAR_HEIGHT = 50;
+const MIN_VALUE = 0;
+const TIME_VALUE = 1;
 
 const createStatisticsTemplate = (data) => {
   const {films, dateTo, dateFrom, currentInput} = data;
   const moviesForStatistic = getWatchedFilmsForStatistics(films, dateTo, dateFrom, currentInput);
 
   const keysGenres = Object.keys(moviesForStatistic.genres);
-  const topGenre = keysGenres.sort((a, b) => moviesForStatistic.genres[b] - moviesForStatistic.genres[a])[0];
+  const topGenre = keysGenres.sort((a, b) => moviesForStatistic.genres[b] - moviesForStatistic.genres[a])[MIN_VALUE];
 
-  const getTotalDuration = (cards) => cards.reduce((acc, card) => (acc += card.runtime),0);
+  const getTotalDuration = (cards) => cards.reduce((acc, card) => (acc + card.runtime), MIN_VALUE);
 
   const duration = getTotalDuration(moviesForStatistic.movies);
   const hours = Math.floor(duration/MINUTES);
@@ -56,7 +58,7 @@ const createStatisticsTemplate = (data) => {
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">${hours > 0 ? hours : 0}<span class="statistic__item-description">h</span>${duration%MINUTES > 0 ? minutes : 0}<span class="statistic__item-description">m</span></p>
+      <p class="statistic__item-text">${hours > MIN_VALUE ? hours : MIN_VALUE}<span class="statistic__item-description">h</span>${duration%MINUTES > MIN_VALUE ? minutes : MIN_VALUE}<span class="statistic__item-description">m</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
@@ -188,7 +190,7 @@ export default class StatisticsView extends SmartView {
         currentInput: evt.target.value,
         dateFrom: (() => {
           const time = evt.target.value;
-          return dayjs().subtract(1 , time).toDate();
+          return dayjs().subtract(TIME_VALUE , time).toDate();
         })(),
 
       },

@@ -1,7 +1,9 @@
-import FilmInformationView from '../view/film-information';
+import FilmInformationView from '../view/film-information.js';
 import { render, RenderPosition, remove, replace } from '../render';
-import CardFilmView from '../view/card-film-views';
-import { UserAction, UpdateType } from '../consts';
+import CardFilmView from '../view/card-film-view.js';
+import { UserAction, UpdateType } from '../consts.js';
+
+const SCROLL_TOP_MIN = 0;
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -30,7 +32,6 @@ export default class MoviePresenter {
   #scroll = null;
   #isDeleting = null;
   #isDisabled = null;
-  #idCommentDelete = null;
   #emotion = ' ';
   #newCommentText = '';
   #mode = Mode.DEFAULT;
@@ -43,15 +44,14 @@ export default class MoviePresenter {
     this.#isDeleting = false;
   }
 
-  init = (film, comments, idCommentDelete) => {
+  init = (film, comments) => {
     this.#film = film;
     this.#comments = comments;
-    this.#idCommentDelete = idCommentDelete;
     const prevFilmComponent = this.#filmComponent;
     const prevFilmEditComponent = this.#filmEditComponent;
     this.#filmComponent = new CardFilmView(film, this.#comments);
 
-    this.#filmEditComponent = new FilmInformationView(this.#film, this.#comments, this.#emotion, this.#newCommentText, this.#isDeleting, this.#idCommentDelete, this.#isDisabled);
+    this.#filmEditComponent = new FilmInformationView(this.#film, this.#comments, this.#emotion, this.#newCommentText, this.#isDeleting, this.#isDisabled);
     this.#filmEditComponent.setFavoriteClickHandler(this.#favoriteClickHandler);
     this.#filmEditComponent.setHistoryClickHandler(this.#historyClickHandler);
     this.#filmEditComponent.setWatchlistClickHandler(this.#watchlistClickHandler);
@@ -194,8 +194,9 @@ export default class MoviePresenter {
   }
 
   #favoriteClickHandler = (comments) => {
-    this.#scroll = this.#filmEditComponent?.element?.scrollTop || 0;
+    this.#scroll = this.#filmEditComponent?.element?.scrollTop || SCROLL_TOP_MIN;
     this.#comments = comments;
+    this.#filmEditComponent.resetDataForNewComment();
     this.#changeData(
       bodyElement.querySelector('.film-details') ? UserAction.UPDATE_FILM_WITH_COMMENTS : UserAction.UPDATE_FILM,
       bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
@@ -204,8 +205,9 @@ export default class MoviePresenter {
   }
 
   #historyClickHandler = (comments) => {
-    this.#scroll = this.#filmEditComponent?.element?.scrollTop || 0;
+    this.#scroll = this.#filmEditComponent?.element?.scrollTop || SCROLL_TOP_MIN;
     this.#comments = comments;
+    this.#filmEditComponent.resetDataForNewComment();
     this.#changeData(
       bodyElement.querySelector('.film-details') ? UserAction.UPDATE_FILM_WITH_COMMENTS : UserAction.UPDATE_FILM,
       bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
@@ -213,8 +215,9 @@ export default class MoviePresenter {
   }
 
   #watchlistClickHandler = (comments) => {
-    this.#scroll = this.#filmEditComponent?.element?.scrollTop || 0;
+    this.#scroll = this.#filmEditComponent?.element?.scrollTop || SCROLL_TOP_MIN;
     this.#comments = comments;
+    this.#filmEditComponent.resetDataForNewComment();
     this.#changeData(
       bodyElement.querySelector('.film-details') ? UserAction.UPDATE_FILM_WITH_COMMENTS : UserAction.UPDATE_FILM,
       bodyElement.querySelector('.film-details') ? UpdateType.PATCH : UpdateType.MINOR,
@@ -223,7 +226,8 @@ export default class MoviePresenter {
 
   #commentDeleteClickHandler = (film, id, comments, isDeleting) => {
     this.#isDeleting = isDeleting;
-    this.#scroll = this.#filmEditComponent?.element?.scrollTop || 0;
+    this.#scroll = this.#filmEditComponent?.element?.scrollTop || SCROLL_TOP_MIN;
+    this.#filmEditComponent.resetDataForNewComment();
     this.#changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
@@ -235,7 +239,7 @@ export default class MoviePresenter {
 
   #commentAddClickHandler = (film, comment, comments, emotionNew, commentTextNew, isDisabled) => {
     this.#isDisabled = isDisabled;
-    this.#scroll = this.#filmEditComponent?.element?.scrollTop || 0;
+    this.#scroll = this.#filmEditComponent?.element?.scrollTop || SCROLL_TOP_MIN;
     this.#emotion = emotionNew;
     this.#newCommentText = commentTextNew;
     this.#changeData(

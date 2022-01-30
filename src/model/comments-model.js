@@ -1,5 +1,5 @@
 import AbstractObservable from '../utils.js';
-import { UpdateType } from '../consts.js';
+import { UpdateType, IndexComments } from '../consts.js';
 
 export default class CommentsModel extends AbstractObservable {
   #apiService = null;
@@ -14,7 +14,9 @@ export default class CommentsModel extends AbstractObservable {
   }
 
   setComments(comments) {
-    this.#comments = [...comments];
+    const moviesComments = [];
+    comments.forEach((result) => moviesComments.push(result.value));
+    this.#comments = [...moviesComments];
     this._notify('INIT', this.#comments);
   }
 
@@ -27,7 +29,9 @@ export default class CommentsModel extends AbstractObservable {
     this.#filmsModel.addObserver((type) => {
       if (type !== UpdateType.INIT) { return; }
       const comments = this.#filmsModel.films.map((film) => this.#apiService.getComments(film.id));
-      Promise.all(comments).then((result) => { this.setComments(result); });
+      Promise.allSettled(comments).then((results) => {
+        this.setComments(results);
+      });
     });
   }
 
@@ -43,7 +47,7 @@ export default class CommentsModel extends AbstractObservable {
       const response = await this.#apiService.addComment(newComment, update);
       this.#filmComments = [
         ...this.#filmComments,
-        response.comments[response.comments.length - 1],
+        response.comments[response.comments.length - IndexComments.FOR_LAST_INDEX],
       ];
       filmIndex.comments = this.#filmComments;
 
@@ -59,15 +63,15 @@ export default class CommentsModel extends AbstractObservable {
     const filmIndex = this.#comments.find((item) => Number(item.id) === Number(update.id));
     this.#filmComments[index].commentDelete = false;
 
-    if (index === -1) {
+    if (index === IndexComments.NOT_FOUND_INDEX) {
       throw new Error('Can\'t delete comment');
     }
 
     try {
       await this.#apiService.deleteComment(this.#filmComments[index]);
       this.#filmComments = [
-        ...this.#filmComments.slice(0, index),
-        ...this.#filmComments.slice(index + 1),
+        ...this.#filmComments.slice(IndexComments.MIN_INDEX, index),
+        ...this.#filmComments.slice(index + IndexComments.INDEX_VALUE),
       ];
       filmIndex.comments = this.#filmComments;
       this._notify(updateType, update, this.#filmComments, id);
