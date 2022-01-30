@@ -20,7 +20,7 @@ export default class ApiService {
   }
 
   getComments(filmId) {
-    return this.#loadComments({ url: `comments/${filmId}` })
+    return this.#load({ url: `comments/${filmId}` })
       .then(ApiService.parseResponse).then((commentsText) => ({ id: filmId, comments: commentsText }));
   }
 
@@ -65,27 +65,6 @@ export default class ApiService {
   }
 
   #load = async ({
-    url,
-    method = Method.GET,
-    body = null,
-    headers = new Headers(),
-  }) => {
-    headers.append('Authorization', this.#authorization);
-
-    const response = await fetch(
-      `${this.#endPoint}/${url}`,
-      { method, body, headers },
-    );
-
-    try {
-      ApiService.checkStatus(response);
-      return response;
-    } catch (err) {
-      ApiService.catchError(err);
-    }
-  }
-
-  #loadComments = async ({
     url,
     method = Method.GET,
     body = null,

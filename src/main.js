@@ -1,6 +1,6 @@
 import ProfileView from './view/profile-view.js';
 import { RenderPosition, render, remove } from './render.js';
-import FooterView from './view/footer-views';
+import FooterView from './view/footer-view.js';
 import MovieListPresenter from './presenter/movie-list-presenter.js';
 import FilmsModel from './model/films-model.js';
 import FilterModel from './model/filter-model.js';
@@ -24,7 +24,7 @@ filmsModel.addObserver((type) => {
   render(footer, new FooterView(filmsModel.films), RenderPosition.BEFOREEND);
 });
 
-const boardPresenter = new MovieListPresenter(filmsModel.films, siteHeaderElement, siteMainElement, filmsModel, filterModel, commentsModel);
+const boardPresenter = new MovieListPresenter(siteHeaderElement, siteMainElement, filmsModel, filterModel, commentsModel);
 
 let statisticsComponent = null;
 let profileComponent = null;

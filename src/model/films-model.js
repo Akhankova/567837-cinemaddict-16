@@ -1,5 +1,5 @@
 import AbstractObservable from '../utils.js';
-import { UpdateType } from '../consts.js';
+import { UpdateType, IndexComments } from '../consts.js';
 
 export default class FilmsModel extends AbstractObservable {
   #films = [];
@@ -27,7 +27,7 @@ export default class FilmsModel extends AbstractObservable {
   updateFilm = async (updateType, update, comments) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
-    if (index === -1) {
+    if (index === IndexComments.NOT_FOUND_INDEX) {
       throw new Error('Can\'t update film');
     }
 
@@ -35,9 +35,9 @@ export default class FilmsModel extends AbstractObservable {
       const response = await this.#apiService.updateMovie(update);
       const updatedMovie = this.adaptToClient(response);
       this.#films = [
-        ...this.#films.slice(0, index),
+        ...this.#films.slice(IndexComments.MIN_INDEX, index),
         update,
-        ...this.#films.slice(index + 1),
+        ...this.#films.slice(index + IndexComments.INDEX_VALUE),
       ];
       this._notify(updateType, updatedMovie, comments);
     } catch (err) {
