@@ -8,17 +8,19 @@ import {FilterType} from './consts.js';
 
 const DESCRIPTION_LENGTH = 140;
 const DESCRIPTION_LENGTH_SHOW = 139;
+const DESCRIPTION_LENGTH_MIN = 0;
+const MIN_VALUE_HOURS = 0;
 
 export const getTime = (runtime) => {
   const dur = dayjs.duration({minutes: runtime}).format('mm');
   const hours = Math.floor(dur/MINUTES);
   const minutes = dur%MINUTES;
-  return hours > 0 ? `${hours}h ${minutes}m` : `$${minutes}m`;
+  return hours > MIN_VALUE_HOURS ? `${hours}h ${minutes}m` : `$${minutes}m`;
 };
 
 export const createMessageCard = (text) => {
   if (text.length >= DESCRIPTION_LENGTH) {
-    text = `${text.substr(0, DESCRIPTION_LENGTH_SHOW)}...`;
+    text = `${text.substr(DESCRIPTION_LENGTH_MIN, DESCRIPTION_LENGTH_SHOW)}...`;
     return text;
   }
   return text;

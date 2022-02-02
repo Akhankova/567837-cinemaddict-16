@@ -5,7 +5,10 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrBefore);
 
-export const statisticsPeriod = {
+const MIN_VALUE_FOR_GENRES = 0;
+const VALUE_FOR_GENRES = 1;
+
+export const StatisticsPeriod = {
   ALL_TIME: 'all-time',
   TODAY: 'today',
   WEEK: 'week',
@@ -13,21 +16,27 @@ export const statisticsPeriod = {
   YEAR: 'year',
 };
 
+export const StatisticsDays = {
+  WEEK: -7,
+  MONTH: -30,
+  YEAR: -365,
+};
+
 export const getFilterMoviesPeriod = (cards, dateTo, dateFrom, currentInput) => {
-  if(currentInput === statisticsPeriod.ALL_TIME){
+  if(currentInput === StatisticsPeriod.ALL_TIME){
     return cards.filter((card) => dayjs(card.watchingDate).isSameOrBefore(dayjs()));
   }
-  if(currentInput === statisticsPeriod.TODAY){
+  if(currentInput === StatisticsPeriod.TODAY){
     return cards.filter((card) => dayjs(card.watchingDate).isSame(dateTo, 'day'));
   }
-  if(currentInput === statisticsPeriod.YEAR){
-    return cards.filter((card) => dayjs(card.watchingDate).isBetween(dayjs().add(-365, 'day'), dayjs(), 'day'));
+  if(currentInput === StatisticsPeriod.YEAR){
+    return cards.filter((card) => dayjs(card.watchingDate).isBetween(dayjs().add(StatisticsDays.YEAR, 'day'), dayjs(), 'day'));
   }
-  if(currentInput === statisticsPeriod.MONTH){
-    return cards.filter((card) => dayjs(card.watchingDate).isBetween(dayjs().add(-30, 'day'), dayjs(), 'day'));
+  if(currentInput === StatisticsPeriod.MONTH){
+    return cards.filter((card) => dayjs(card.watchingDate).isBetween(dayjs().add(StatisticsDays.MONTH, 'day'), dayjs(), 'day'));
   }
-  if(currentInput === statisticsPeriod.WEEK){
-    return cards.filter((card) => dayjs(card.watchingDate).isBetween(dayjs().add(-7, 'day'), dayjs(), 'day'));
+  if(currentInput === StatisticsPeriod.WEEK){
+    return cards.filter((card) => dayjs(card.watchingDate).isBetween(dayjs().add(StatisticsDays.WEEK, 'day'), dayjs(), 'day'));
   }
   return cards.filter((card) =>
     dayjs(card.watchingDate).isSame(dateFrom , 'day') ||
@@ -49,7 +58,7 @@ export const getWatchedFilmsForStatistics = (cards, dateTo, dateFrom, currentInp
   const filmsGenres = [];
   watchedFilmsStat.movies.filter((film) => filmsGenres.push(film.genre));
   watchedFilmsStat.genres = filmsGenres.flat().reduce((acc, el) => {
-    acc[el] = (acc[el] || 0) + 1;
+    acc[el] = (acc[el] || MIN_VALUE_FOR_GENRES) + VALUE_FOR_GENRES;
     return acc;
   }, {});
 
