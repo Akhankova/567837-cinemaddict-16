@@ -9,6 +9,15 @@ const MINUTES = 60;
 const BAR_HEIGHT = 50;
 const MIN_VALUE = 0;
 const TIME_VALUE = 1;
+const YEAR_COUNT = 1;
+
+const GenresChart = {
+  BAR_THICKNESS: 24,
+  SIZE: 20,
+  OFFSET: 40,
+  PADDING: 100,
+  FONT_SIZE: 20,
+};
 
 const createStatisticsTemplate = (data) => {
   const {films, dateTo, dateFrom, currentInput} = data;
@@ -94,7 +103,7 @@ const renderGenresChart = (statisticCtx, data) => {
         backgroundColor: '#ffe800',
         hoverBackgroundColor: '#ffe800',
         anchor: 'start',
-        barThickness: 24,
+        barThickness: GenresChart.BAR_THICKNESS,
       }],
     },
     options: {
@@ -102,20 +111,20 @@ const renderGenresChart = (statisticCtx, data) => {
       plugins: {
         datalabels: {
           font: {
-            size: 20,
+            size: GenresChart.SIZE,
           },
           color: '#ffffff',
           anchor: 'start',
           align: 'start',
-          offset: 40,
+          offset: GenresChart.OFFSET,
         },
       },
       scales: {
         yAxes: [{
           ticks: {
             fontColor: '#ffffff',
-            padding: 100,
-            fontSize: 20,
+            padding: GenresChart.PADDING,
+            fontSize: GenresChart.FONT_SIZE,
           },
           gridLines: {
             display: false,
@@ -150,10 +159,7 @@ export default class StatisticsView extends SmartView {
     super();
     this._data = {
       films,
-      dateFrom: (() => {
-        const yearCount = 1;
-        return dayjs().subtract( yearCount , 'year').toDate();
-      })(),
+      dateFrom: (() => dayjs().subtract( YEAR_COUNT , 'year').toDate())(),
       dateTo: dayjs().toDate(),
       currentInput: 'all-time',
     };

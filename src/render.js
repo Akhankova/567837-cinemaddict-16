@@ -7,6 +7,13 @@ export const RenderPosition = {
   AFTEREND: 'afterend',
 };
 
+const RatingValue = {
+  NOVICE: 10,
+  FAN: 20,
+  BUFF: 21,
+  NOT_RATING: 0,
+};
+
 export const render = (container, element, place) => {
   const parent = container instanceof AbstractView ? container.element : container;
   const child = element instanceof AbstractView ? element.element : element;
@@ -27,17 +34,17 @@ export const render = (container, element, place) => {
   }
 };
 
-export const getRating = (wachedMovies) => {
-  if(wachedMovies === 0){
+export const getRating = (watchedMovies) => {
+  if(watchedMovies === RatingValue.NOT_RATING){
     return '';
   }
-  if(wachedMovies <= 10){
+  if(watchedMovies <= RatingValue.NOVICE){
     return 'Novice';
   }
-  if(wachedMovies <= 20){
+  if(watchedMovies <= RatingValue.FAN){
     return 'Fan';
   }
-  if(wachedMovies >= 21){
+  if(watchedMovies >= RatingValue.BUFF){
     return 'Movie Buff';
   }
 };

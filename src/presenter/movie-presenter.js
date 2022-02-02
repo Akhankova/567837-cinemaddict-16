@@ -1,4 +1,4 @@
-import FilmInformationView from '../view/film-information.js';
+import FilmInformationView from '../view/film-information-view.js';
 import { render, RenderPosition, remove, replace } from '../render';
 import CardFilmView from '../view/card-film-view.js';
 import { UserAction, UpdateType } from '../consts.js';

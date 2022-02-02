@@ -1,10 +1,10 @@
-import BoardFilmsView from '../view/board-films-views';
+import BoardFilmsView from '../view/board-films-view.js';
 import SortView from '../view/sort-view';
 import FilmsListView from '../view/films-list-view';
-import FilmsContainerView from '../view/films-container-views';
+import FilmsContainerView from '../view/films-container-view.js';
 import NoCardsView from '../view/no-cards-view';
 import { CARD_COUNT_PER_STEP, SortType, UpdateType, UserAction, FilterType } from '../consts';
-import ButtonShowMoreView from '../view/show-more-button-views';
+import ButtonShowMoreView from '../view/button-show-more-view.js';
 import MoviePresenter, { State as MoviePresenterViewState } from './movie-presenter';
 import { RenderPosition, render, remove, getSortRateCard, getSortDateCard } from '../render';
 import { filter } from '../utils.js';
